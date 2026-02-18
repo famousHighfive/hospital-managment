@@ -1,3 +1,6 @@
+import { ref } from "vue"
+
+export const isAuth = ref(localStorage.getItem('auth') === 'true')
 import { onMounted, ref } from "vue"
 /*--------------------------------------------------------
 VARIABLE AUTHENTIFICATION
@@ -13,6 +16,11 @@ export const currentUser = ref(
         ? JSON.parse(localStorage.getItem('user'))
         : null
 )
+
+export const fakeUsers = ref([
+    { name: 'admin', email: 'admin@admin.com', password: '1234', role: 'admin' },
+    { name: 'doctor', email: 'doctor@doctor.com', password: '12345', role: 'doctor' },
+    { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }])
 
 
 /*--------------------------------------------------------

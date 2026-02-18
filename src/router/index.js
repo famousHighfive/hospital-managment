@@ -7,6 +7,9 @@ import DoctorAdmin from '@/views/dashboard/childAdmin/DoctorAdmin.vue'
 import PatientAdmin from '@/views/dashboard/childAdmin/PatientAdmin.vue'
 import RoomAdmin from '@/views/dashboard/childAdmin/RoomAdmin.vue'
 import UsersAdmin from '@/views/dashboard/childAdmin/UsersAdmin.vue'
+import AppointmentDoctor from '@/views/dashboard/childDoctor/AppointmentDoctor.vue'
+import DashboardHomeDoctor from '@/views/dashboard/childDoctor/DashboardHomeDoctor.vue'
+import PatientDoctor from '@/views/dashboard/childDoctor/PatientDoctor.vue'
 import AppointmentReception from '@/views/dashboard/childReception/AppointmentReception.vue'
 import DashboardHomeReception from '@/views/dashboard/childReception/DashboardHomeReception.vue'
 import DoctorReception from '@/views/dashboard/childReception/DoctorReception.vue'
@@ -33,6 +36,7 @@ const router = createRouter({
       name: 'dashboard-admin',
       component: DashboardAdmin,
       meta: { requiresAuth: true, role: 'admin' },
+       children: [
       children: [
         { path: '', name: 'dashboard-admin-home', component: DashboardHomeAdmin },
         { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
@@ -47,6 +51,10 @@ const router = createRouter({
       name: 'dashboard-doctor',
       component: DashboardDoctor,
       meta: { requiresAuth: true, role: 'doctor' },
+          children: [
+        { path: '', name: 'dashboard-doctor-home', component: DashboardHomeDoctor },
+        { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor },
+        { path: 'appointment', name: 'dashboard-doctor-appointment', component: AppointmentDoctor },
       children: [
         // { path: '', name: 'dashboard-doctor-home', component: DashboardHomeAdmin },
         // { path: 'patient', name: 'dashboard-doctor-patient', component: Patient },

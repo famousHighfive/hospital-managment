@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue'
+import { addPatient } from '@/services/patientService'
 import { computed, ref } from 'vue'
 import { addPatient } from '@/services/patientService'
 import { doctors } from '@/services/doctorService'
@@ -64,6 +66,11 @@ const handleSubmit = () => {
 
             <input v-model="phone" placeholder="Téléphone" class="p-2 border rounded" />
 
+            <input v-model="bloodGroup" placeholder="Groupe sanguin" class="p-2 border rounded" />
+
+            <input v-model="doctor" placeholder="Médecin" class="p-2 border rounded" />
+
+            <input v-model="room" placeholder="Chambre" class="p-2 border rounded" />
             <select v-model="bloodGroup" class="p-2 border rounded w-full">
                 <option disabled value="">Groupe sanguin</option>
                 <option value="A+">A+</option>
@@ -99,6 +106,7 @@ const handleSubmit = () => {
         </div>
 
         <button @click="handleSubmit" class="mt-6 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+            Enregistrer
             Enregistrer Patient
         </button>
     </div>

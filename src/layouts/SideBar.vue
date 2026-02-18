@@ -1,4 +1,9 @@
 <script setup>
+import { currentUser } from '@/services/authService'
+import { computed } from 'vue'
+
+const role = computed(() => currentUser.value?.role)
+
 import { currentUser, logout } from '@/services/authService'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -13,6 +18,7 @@ const dashboardBase = computed(() => {
   return `/dashboard-${role.value}`
 })
 
+// helper pour générer les liens enfants
 // pour générer les liens enfants
 const routePath = (child) => {
   if (!role.value) return '/'
@@ -49,6 +55,8 @@ const disconnect = () => {
 
       <!-- Navigation -->
       <nav class="mt-6 space-y-2 px-4">
+        <router-link :to="dashboardBase"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-700">
         <router-link :to="dashboardBase" v-if="role"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -63,6 +71,7 @@ const disconnect = () => {
           <span>Dashboard</span>
         </router-link>
 
+        <router-link :to="routePath('patient')"
         <router-link :to="routePath('patient')" v-if="role"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -77,6 +86,7 @@ const disconnect = () => {
           <span>Patients</span>
         </router-link>
 
+        <!-- <router-link :to="routePath('doctor')"
         <router-link :to="routePath('doctor')" v-if="role === 'admin'"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -90,6 +100,9 @@ const disconnect = () => {
               <circle cx="20" cy="10" r="2"></circle>
             </svg></span>
           <span>Médecins</span>
+        </router-link> -->
+
+        <router-link :to="routePath('appointment')"
         </router-link>
 
         <router-link :to="routePath('appointment')" v-if="role"
@@ -106,6 +119,7 @@ const disconnect = () => {
           <span>Rendez-vous</span>
         </router-link>
 
+        <!-- <router-link :to="routePath('room')"
         <router-link :to="routePath('room')" v-if="role !== 'doctor'"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -118,6 +132,10 @@ const disconnect = () => {
               <path d="M6 8v9"></path>
             </svg></span>
           <span>Chambres</span>
+        </router-link> -->
+
+        <router-link  v-if="role === 'admin'"
+  :to="routePath('users')"
         </router-link>
 
         <router-link v-if="role === 'admin'" :to="routePath('users')"
@@ -145,6 +163,7 @@ const disconnect = () => {
 
     <!-- Logout -->
     <div class="px-4 py-6 border-t border-emerald-700">
+      <button class="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-emerald-700 transition">
       <button @click="disconnect"
         class="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-emerald-700 transition">
         <span>↩</span>

@@ -1,4 +1,20 @@
 <script setup>
+
+
+</script>
+
+
+<template>
+
+
+
+</template>
+
+
+<style scoped>
+
+
+</style>
 import { ref, computed } from 'vue'
 import { patients } from '@/services/patientService'
 import { doctors } from '@/services/doctorService'
