@@ -1,4 +1,7 @@
 
+import DoctorForm from '@/components/ui/doctor/DoctorForm.vue'
+import AssignPatientModal from '@/components/ui/room/AssignPatientModal.vue'
+import RoomForm from '@/components/ui/room/RoomForm.vue'
 import { currentUser, isAuth } from '@/services/authService'
 import Login from '@/views/authServices/Login.vue'
 import AppointmentAdmin from '@/views/dashboard/childAdmin/AppointmentAdmin.vue'
@@ -31,7 +34,7 @@ const router = createRouter({
       name: 'login',
       component: Login,
     },
-      // ================= DASHBOARD =================
+    // ================= DASHBOARD =================
     {
       path: '/dashboard-admin',
       name: 'dashboard-admin',
@@ -45,18 +48,24 @@ const router = createRouter({
         { path: 'appointment', name: 'dashboard-admin-appointment', component: AppointmentAdmin },
         { path: 'room', name: 'dashbord-admin-room', component: RoomAdmin },
         { path: 'users', name: 'dashboard-admin-users', component: UsersAdmin },
-        ]
+        { path: 'dashboard-admin-doctor-create', name: 'dashboard-admin-doctor-create', component: DoctorForm },
+        {
+          path: 'assign-patient', name: 'assign-patient', component: AssignPatientModal
+        },
+        {
+          path: 'dashboard-admin-room-create', name: 'dashboard-admin-room-create', component: RoomForm
+ }]
     },
     {
       path: '/dashboard-doctor',
       name: 'dashboard-doctor',
       component: DashboardDoctor,
       meta: { requiresAuth: true, role: 'doctor' },
-          children: [
+      children: [
         { path: '', name: 'dashboard-doctor-home', component: DashboardHomeDoctor },
         { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor },
         { path: 'appointment', name: 'dashboard-doctor-appointment', component: AppointmentDoctor },
-        ]
+      ]
     },
     {
       path: '/dashboard-receptioniste',
@@ -69,7 +78,7 @@ const router = createRouter({
         { path: 'doctor', name: 'dashboard-receptioniste-doctor', component: DoctorReception },
         { path: 'appointment', name: 'dashboard-receptioniste-appointment', component: AppointmentReception },
         { path: 'room', name: 'dashboard-receptioniste-room', component: RoomReception },
-        ]
+      ]
     },
     {
       path: '/unauthentificated',

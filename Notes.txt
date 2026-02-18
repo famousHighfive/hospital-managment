@@ -18,20 +18,20 @@ Coté ADMIN :
         - Pas de doublons de chambre lors de la creation
     * CREATION DUNE PAGE RECEPTIONIST pour lajout, modification et suppression dun RECEPTIONIST
     * Page User
-        - Formulaire dajout de USER (soit docteur / receptioniste) le formulaire doit etre dynamique de tel sorte que quand on choisi le role dans select le form sadapte
+        - Formulaire dajout de USER (soit docteur / receptioniste) le formulaire doit etre dynamique de tel sorte que quand on choisi le role dans select le form sadapte ✅
 
 Coté Doctor
     * Page Dashboard
-        - Les donnes doivent etre dynamise en fonction du docteur connecté
+        - Les donnes doivent etre dynamise en fonction du docteur connecté✅
     * Page Patient
-        - Liste de ses patients
-        - Pas de bouton dajout de patient
-        - Pas de champs medecin dans les infos des patients affichee
+        - Liste de ses patients✅
+        - Pas de bouton dajout de patient✅
+        - Pas de champs medecin dans les infos des patients affichee✅
     * Page RDV  
-        - Pas de champs medecin dans le formulaire dajout de rdv
-        - Le statut dun rdv est confirme par defaut 
-        - A la creation, pas de statut ANNULER  
-        - modification de rdv et passer le statut a ANNULER REPOUSSER, TRAITE (si traite, le champs de CHAMBRE est vidé et le statut passe a SORTI)
+        - Pas de champs medecin dans le formulaire dajout de rdv✅
+        - Le statut dun rdv est confirme par defaut ✅
+        - A la creation, pas de statut ANNULER  ✅
+        - modification de rdv et passer le statut a ANNULER REPOUSSER, TRAITE (si traite, le champs de CHAMBRE est vidé et le statut passe a SORTI)✅
     
 Coté receptioniste
     * La rubrique dajout de NOTES  a deplacer dans DOCTOR (PAGE PATIENT DETAIL)
