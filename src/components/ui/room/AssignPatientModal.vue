@@ -1,32 +1,81 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { patients } from '@/services/patientService'
+import { rooms } from '@/services/roomService'
 
-const props = defineProps({
-    room: Object
-})
+const route = useRoute()
+const router = useRouter()
 
-const patients = ref([
-    'Jean Dupont',
-    'Marie Martin',
-    'Pierre Bernard'
-])
+// 🔹 Récupérer l'id depuis l'URL
+const roomId = Number(route.query.roomId)
+
+// 🔹 Trouver la chambre
+const room = computed(() =>
+  rooms.value.find(r => r.id === roomId)
+)
 
 const selectedPatient = ref('')
+
+// 🔹 Patients sans chambre
+const availablePatients = computed(() =>
+  patients.value.filter(p => !p.room)
+)
+
+const assignPatient = () => {
+  const patient = patients.value.find(
+    p => p.id === Number(selectedPatient.value)
+  )
+
+  if (!patient || !room.value) return
+
+  // 🚫 Si chambre pleine
+  if (room.value.currentOccupants >= room.value.capacity) {
+    alert("Chambre déjà complète")
+    return
+  }
+
+  // ✅ Assigner numéro chambre
+  patient.room = room.value.number
+
+  // ✅ Incrémenter occupation
+  room.value.currentOccupants++
+
+  // ✅ Sauvegarder
+  localStorage.setItem('patients', JSON.stringify(patients.value))
+  localStorage.setItem('rooms', JSON.stringify(rooms.value))
+
+  router.push({ name: 'dashbord-admin-room' })
+}
 </script>
 
 <template>
-    <div>
-        <h2 class="text-xl font-bold mb-4">
-            Assigner patient à la chambre {{ room?.id }}
-        </h2>
+  <div v-if="room" class="p-6">
+    <h2 class="text-xl font-bold mb-4">
+      Assigner patient à la chambre {{ room.number }}
+    </h2>
 
-        <select v-model="selectedPatient" class="w-full p-3 border rounded-lg mb-4">
-            <option disabled value="">Choisir un patient</option>
-            <option v-for="p in patients" :key="p">{{ p }}</option>
-        </select>
+    <select v-model="selectedPatient" class="w-full p-3 border rounded-lg mb-4">
+      <option disabled value="">Choisir un patient</option>
+      <option 
+        v-for="p in availablePatients" 
+        :key="p.id" 
+        :value="p.id"
+      >
+        {{ p.firstName }} {{ p.lastName }}
+      </option>
+    </select>
 
-        <button class="w-full bg-green-600 text-white py-2 rounded-lg">
-            Confirmer
-        </button>
-    </div>
+    <button
+      class="w-full bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
+      :disabled="!selectedPatient"
+      @click="assignPatient"
+    >
+      Confirmer
+    </button>
+  </div>
+
+  <div v-else class="p-6 text-red-500">
+    Chambre introuvable
+  </div>
 </template>
