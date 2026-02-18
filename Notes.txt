@@ -1,1 +1,37 @@
 https://www.figma.com/make/LNtqsbroyWeI2bI8CNfFzq/Hospital-Management-Application?p=f&t=S3FGwJ13FFhYyedP-0&fullscreen=1&preview-route=%2Flogin
+
+
+Coté ADMIN :
+    * Page Dashboard
+        - Les données du dashboard doivent etre dynamiques
+    * Page Patient
+        - Un patient en consultation ou sortir n'a plus de chambre 
+        - implementation du bouton de modification dun patient
+    * Page Medecin
+        - Affichage de tous les patients 
+        - Ajout et modifciation de patients
+    * Page RDV
+        - Bouton de modification
+        - Si la date et lheure saisir lors de la creation du rdv est passé, le formulaire ne valide pas
+    * Page Chambre 
+        - Seul un patient hospitalisé a droit detre assigné a une chambre
+        - Pas de doublons de chambre lors de la creation
+    * CREATION DUNE PAGE RECEPTIONIST pour lajout, modification et suppression dun RECEPTIONIST
+    * Page User
+        - Formulaire dajout de USER (soit docteur / receptioniste) le formulaire doit etre dynamique de tel sorte que quand on choisi le role dans select le form sadapte
+
+Coté Doctor
+    * Page Dashboard
+        - Les donnes doivent etre dynamise en fonction du docteur connecté
+    * Page Patient
+        - Liste de ses patients
+        - Pas de bouton dajout de patient
+        - Pas de champs medecin dans les infos des patients affichee
+    * Page RDV  
+        - Pas de champs medecin dans le formulaire dajout de rdv
+        - Le statut dun rdv est confirme par defaut 
+        - A la creation, pas de statut ANNULER  
+        - modification de rdv et passer le statut a ANNULER REPOUSSER, TRAITE (si traite, le champs de CHAMBRE est vidé et le statut passe a SORTI)
+    
+Coté receptioniste
+    * La rubrique dajout de NOTES  a deplacer dans DOCTOR (PAGE PATIENT DETAIL)

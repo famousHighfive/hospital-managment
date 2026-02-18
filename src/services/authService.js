@@ -25,6 +25,9 @@ export const fakeUsers = ref([
     { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }
 ])
 
+console.log(fakeUsers);
+
+
 // Enregistrement et recuperation dans le local storage
 // localStorage.setItem('patients', JSON.stringify(fakeUsers.value))
 // onMounted(() => {

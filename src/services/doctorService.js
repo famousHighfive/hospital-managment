@@ -50,10 +50,12 @@ export function getDoctors() {
 
 export function addDoctor(doctor) {
   doctor.id = Date.now()
+  doctor.userId = null // 🔥 liaison utilisateur
   doctor.createdAt = new Date().toISOString()
   doctors.value.push(doctor)
   save()
 }
+
 
 export function updateDoctor(updatedDoctor) {
   const index = doctors.value.findIndex(d => d.id === updatedDoctor.id)

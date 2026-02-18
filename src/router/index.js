@@ -1,5 +1,6 @@
 
 import DoctorForm from '@/components/ui/doctor/DoctorForm.vue'
+import ReceptionForm from '@/components/ui/reception/ReceptionForm.vue'
 import AssignPatientModal from '@/components/ui/room/AssignPatientModal.vue'
 import RoomForm from '@/components/ui/room/RoomForm.vue'
 import { currentUser, isAuth } from '@/services/authService'
@@ -8,6 +9,7 @@ import AppointmentAdmin from '@/views/dashboard/childAdmin/AppointmentAdmin.vue'
 import DashboardHomeAdmin from '@/views/dashboard/childAdmin/DashboardHomeAdmin.vue'
 import DoctorAdmin from '@/views/dashboard/childAdmin/DoctorAdmin.vue'
 import PatientAdmin from '@/views/dashboard/childAdmin/PatientAdmin.vue'
+import ReceptionistAdmin from '@/views/dashboard/childAdmin/ReceptionistAdmin.vue'
 import RoomAdmin from '@/views/dashboard/childAdmin/RoomAdmin.vue'
 import UsersAdmin from '@/views/dashboard/childAdmin/UsersAdmin.vue'
 import AppointmentDoctor from '@/views/dashboard/childDoctor/AppointmentDoctor.vue'
@@ -43,6 +45,7 @@ const router = createRouter({
         { path: '', name: 'dashboard-admin-home', component: DashboardHomeAdmin },
         { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
         { path: 'doctor', name: 'dashboard-admin-doctor', component: DoctorAdmin },
+        { path: 'receptionist', name: 'dashboard-admin-receptionist', component: ReceptionistAdmin},
         { path: 'appointment', name: 'dashboard-admin-appointment', component: AppointmentAdmin },
         { path: 'room', name: 'dashbord-admin-room', component: RoomAdmin },
         { path: 'users', name: 'dashboard-admin-users', component: UsersAdmin },
@@ -52,7 +55,11 @@ const router = createRouter({
         },
         {
           path: 'dashboard-admin-room-create', name: 'dashboard-admin-room-create', component: RoomForm
- }]
+ },
+    {
+          path: 'dashboard-admin-receptionist-create', name: 'dashboard-admin-receptionist-create', component: ReceptionForm
+ },
+]
     },
     {
       path: '/dashboard-doctor',
