@@ -37,6 +37,7 @@ const router = createRouter({
       component: DashboardAdmin,
       meta: { requiresAuth: true, role: 'admin' },
        children: [
+      children: [
         { path: '', name: 'dashboard-admin-home', component: DashboardHomeAdmin },
         { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
         { path: 'doctor', name: 'dashboard-admin-doctor', component: DoctorAdmin },
@@ -54,6 +55,9 @@ const router = createRouter({
         { path: '', name: 'dashboard-doctor-home', component: DashboardHomeDoctor },
         { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor },
         { path: 'appointment', name: 'dashboard-doctor-appointment', component: AppointmentDoctor },
+      children: [
+        // { path: '', name: 'dashboard-doctor-home', component: DashboardHomeAdmin },
+        // { path: 'patient', name: 'dashboard-doctor-patient', component: Patient },
         ]
     },
     {

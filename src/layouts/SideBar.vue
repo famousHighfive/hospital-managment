@@ -4,6 +4,14 @@ import { computed } from 'vue'
 
 const role = computed(() => currentUser.value?.role)
 
+import { currentUser, logout } from '@/services/authService'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const role = computed(() => currentUser.value?.role)
+
+
 // base du dashboard
 const dashboardBase = computed(() => {
   if (!role.value) return '/'
@@ -11,9 +19,15 @@ const dashboardBase = computed(() => {
 })
 
 // helper pour générer les liens enfants
+// pour générer les liens enfants
 const routePath = (child) => {
   if (!role.value) return '/'
   return `/dashboard-${role.value}/${child}`
+}
+
+const disconnect = () => {
+  logout()
+  router.replace('/')
 }
 </script>
 
@@ -43,6 +57,8 @@ const routePath = (child) => {
       <nav class="mt-6 space-y-2 px-4">
         <router-link :to="dashboardBase"
           class="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-700">
+        <router-link :to="dashboardBase" v-if="role"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="lucide lucide-layout-dashboard"
@@ -56,6 +72,7 @@ const routePath = (child) => {
         </router-link>
 
         <router-link :to="routePath('patient')"
+        <router-link :to="routePath('patient')" v-if="role"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -70,6 +87,7 @@ const routePath = (child) => {
         </router-link>
 
         <!-- <router-link :to="routePath('doctor')"
+        <router-link :to="routePath('doctor')" v-if="role === 'admin'"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -85,6 +103,9 @@ const routePath = (child) => {
         </router-link> -->
 
         <router-link :to="routePath('appointment')"
+        </router-link>
+
+        <router-link :to="routePath('appointment')" v-if="role"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -99,6 +120,7 @@ const routePath = (child) => {
         </router-link>
 
         <!-- <router-link :to="routePath('room')"
+        <router-link :to="routePath('room')" v-if="role !== 'doctor'"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -114,6 +136,9 @@ const routePath = (child) => {
 
         <router-link  v-if="role === 'admin'"
   :to="routePath('users')"
+        </router-link>
+
+        <router-link v-if="role === 'admin'" :to="routePath('users')"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -139,6 +164,8 @@ const routePath = (child) => {
     <!-- Logout -->
     <div class="px-4 py-6 border-t border-emerald-700">
       <button class="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-emerald-700 transition">
+      <button @click="disconnect"
+        class="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-emerald-700 transition">
         <span>↩</span>
         <span>Déconnexion</span>
       </button>

@@ -1,6 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { addPatient } from '@/services/patientService'
+import { computed, ref } from 'vue'
+import { addPatient } from '@/services/patientService'
+import { doctors } from '@/services/doctorService'
+import { rooms } from '@/services/roomService'
 
 const emit = defineEmits(['close'])
 
@@ -12,6 +16,16 @@ const bloodGroup = ref('')
 const doctor = ref('')
 const room = ref('')
 const status = ref('Hospitalisé')
+
+// Filtrer les docteurs ayant available: true
+const availableDoctors = computed(() => {
+    return doctors.value.filter(doc => doc.available)
+})
+
+// Filtrer les chambres ayant le statut "Libre"
+const availableRooms = computed(() => {
+    return rooms.value.filter(r => r.status === 'Libre')
+})
 
 const handleSubmit = () => {
     if (!firstName.value || !lastName.value || !gender.value) {
@@ -57,6 +71,31 @@ const handleSubmit = () => {
             <input v-model="doctor" placeholder="Médecin" class="p-2 border rounded" />
 
             <input v-model="room" placeholder="Chambre" class="p-2 border rounded" />
+            <select v-model="bloodGroup" class="p-2 border rounded w-full">
+                <option disabled value="">Groupe sanguin</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+
+            <select v-model="doctor" class="p-2 border rounded">
+                <option disabled value="">Médecin dispo</option>
+                <option v-for="doc in availableDoctors" :key="doc.id" :value="doc.name">
+                    {{ doc.name }} ({{ doc.speciality }})
+                </option>
+            </select>
+
+            <select v-model="room" class="p-2 border rounded">
+                <option disabled value="">Chambre libre</option>
+                <option v-for="r in availableRooms" :key="r.id" :value="r.number">
+                    Chambre {{ r.number }} ({{ r.capacity }} lits)
+                </option>
+            </select>
 
             <select v-model="status" class="p-2 border rounded">
                 <option>Hospitalisé</option>
@@ -68,6 +107,7 @@ const handleSubmit = () => {
 
         <button @click="handleSubmit" class="mt-6 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
             Enregistrer
+            Enregistrer Patient
         </button>
     </div>
 </template>

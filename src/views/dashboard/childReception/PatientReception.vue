@@ -2,6 +2,7 @@
 import { ref, computed, handleError } from 'vue'
 import { deletePatient, patients } from '@/services/patientService'
 import BaseModal from '@/components/ui/BaseModal.vue'
+import PatientFormModal from '@/components/ui/patient/PatientFormModal.vue'
 
 const search = ref('')
 const showAddModal = ref(false)
