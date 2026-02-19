@@ -2,7 +2,9 @@
 import { ref, computed } from 'vue'
 import { getPatientById, updatePatient } from '@/services/patientService'
 import { useRoute, useRouter } from 'vue-router'
+import { currentUser } from '@/services/authService'
 
+const role = computed(() => currentUser.value?.role)
 const route = useRoute()
 const router = useRouter()
 
@@ -146,7 +148,7 @@ const addNote = () => {
         </div>
 
         <!-- Notes médicales -->
-        <div class="bg-white rounded-2xl shadow p-8">
+        <div v-if="role === 'doctor'" class="bg-white rounded-2xl shadow p-8">
             <h2 class="text-xl font-semibold mb-6">Notes médicales</h2>
 
             <div class="mb-4">

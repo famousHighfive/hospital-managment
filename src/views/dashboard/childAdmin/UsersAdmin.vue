@@ -37,7 +37,7 @@ const showModal = ref(false)
         <tbody class="text-gray-700">
 
   <tr
-    v-for="user in allUsers"
+    v-for="user in users"
     :key="user.id"
     class="border-b hover:bg-gray-50"
   >

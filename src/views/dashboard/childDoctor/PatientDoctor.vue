@@ -4,10 +4,12 @@ import {
   addPatient,
   deletePatient as deletePatientService,
   updatePatient,
-  getPatientById,
+  // getPatientById,
 } from '@/services/patientService'
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const search = ref('')
 const statusFilter = ref('')
 
@@ -46,13 +48,13 @@ const toast = ref({
 // const genderOptions = ['H', 'F']
 const bloodGroupOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 const statusOptions = ['Hospitalisé', 'En consultation', 'Sorti']
-const doctorOptions = [
-  'Dr. Laurent Blanc',
-  'Dr. Sophie Petit',
-  'Dr. Marc Lefebvre',
-  'Dr. Anne Durand',
-  'Dr. Pierre Leclerc',
-]
+// const doctorOptions = [
+//   'Dr. Laurent Blanc',
+//   'Dr. Sophie Petit',
+//   'Dr. Marc Lefebvre',
+//   'Dr. Anne Durand',
+//   'Dr. Pierre Leclerc',
+// ]
 
 const filteredPatients = computed(() => {
   return patients.value.filter((p) => {
@@ -188,10 +190,10 @@ function confirmDelete() {
 }
 
 // View patient details
-function viewPatient(patient) {
-  viewingPatient.value = patient
-  showViewModal.value = true
-}
+// function viewPatient(patient) {
+//   viewingPatient.value = patient
+//   showViewModal.value = true
+// }
 
 function closeViewModal() {
   showViewModal.value = false
@@ -213,7 +215,10 @@ function showToast(message, type = 'success') {
 </script>
 
 <template>
-  <div class="p-8 bg-gray-100 min-h-screen font-sans">
+  <div v-if="route.params.id">
+    <RouterView />
+  </div>
+  <div v-else class="p-8 bg-gray-100 min-h-screen font-sans">
     <div class="flex items-start justify-between mb-8">
       <div>
         <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Gestion des Patients</h1>
@@ -319,7 +324,7 @@ function showToast(message, type = 'success') {
               <button
                 class="transition-transform hover:scale-125 hover:text-blue-500"
                 title="Voir"
-                @click="viewPatient(patient)"
+                 @click="$router.push({ name: 'patient-info-doctor-detail', params: { id: patient.id } })"
               >
                 👁
               </button>

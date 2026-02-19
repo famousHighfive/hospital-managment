@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { addUser } from '@/services/userService'
-import { getDoctors } from '@/services/doctorService'
+import { getDoctors, updateDoctor } from '@/services/doctorService'
 import { getReceptionists } from '@/services/receptionistService'
 
 const emit = defineEmits(['close'])
@@ -27,24 +27,39 @@ const availableReceptionists = computed(() =>
 
 function handleSubmit() {
 
+  console.log(selectedProfile.value);
+
+
   const newUser = {
     name: name.value,
     email: email.value,
     password: password.value,
     role: role.value
+    // id
+    // createAt
   }
 
   addUser(newUser)
 
-  // 🔥 LIAISON
+
   if (role.value === 'doctor') {
     const doctor = doctors.value.find(d => d.id === selectedProfile.value)
-    if (doctor) doctor.userId = newUser.id
+
+
+    if (doctor) {
+    doctor.userId = newUser.id
+     updateDoctor(doctor);
+    }
+
   }
 
-  if (role.value === 'receptionist') {
+  if (role.value === 'receptioniste') {
     const receptionist = receptionists.value.find(r => r.id === selectedProfile.value)
-    if (receptionist) receptionist.userId = newUser.id
+    if (receptionist) {
+      receptionist.userId = newUser.id
+     updateDoctor(receptionist);
+
+    }
   }
 
   emit('close')
@@ -55,7 +70,7 @@ function handleSubmit() {
 
     <h2 class="text-lg font-bold mb-4">Nouvel Utilisateur</h2>
 
-    <input v-model="name" placeholder="Nom"
+    <input v-model="name" placeholder="Pseudo"
       class="border p-2 w-full mb-3 rounded"/>
 
     <input v-model="email" placeholder="Email"
@@ -70,7 +85,7 @@ function handleSubmit() {
       <option disabled value="">Choisir un rôle</option>
       <option value="admin">Administrateur</option>
       <option value="doctor">Médecin</option>
-      <option value="receptionist">Réceptionniste</option>
+      <option value="receptioniste">Réceptionniste</option>
     </select>
 
     <!-- 🔥 Sélection dynamique -->
@@ -90,7 +105,7 @@ function handleSubmit() {
     </select>
 
     <select
-      v-if="role === 'receptionist'"
+      v-if="role === 'receptioniste'"
       v-model="selectedProfile"
       class="border p-2 w-full mb-3 rounded"
     >

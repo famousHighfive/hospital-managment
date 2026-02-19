@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { patients } from '@/services/patientService'
 import { doctors } from '@/services/doctorService'
-import { addAppointment, appointments } from '@/services/appointmentService'
+import { addAppointment } from '@/services/appointmentService'
 
 const emit = defineEmits(['close'])
 

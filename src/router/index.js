@@ -43,7 +43,7 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
       children: [
         { path: '', name: 'dashboard-admin-home', component: DashboardHomeAdmin },
-        { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
+        { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-admin-detail', component: PatientInfoPage }] },
         { path: 'doctor', name: 'dashboard-admin-doctor', component: DoctorAdmin },
         { path: 'receptionist', name: 'dashboard-admin-receptionist', component: ReceptionistAdmin},
         { path: 'appointment', name: 'dashboard-admin-appointment', component: AppointmentAdmin },
@@ -68,7 +68,7 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'doctor' },
       children: [
         { path: '', name: 'dashboard-doctor-home', component: DashboardHomeDoctor },
-        { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor },
+        { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor, children: [{ path: ':id', name: 'patient-info-doctor-detail', component: PatientInfoPage }] },
         { path: 'appointment', name: 'dashboard-doctor-appointment', component: AppointmentDoctor },
       ]
     },
@@ -79,7 +79,7 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'receptioniste' },
       children: [
         { path: '', name: 'dashboard-receptioniste-home', component: DashboardHomeReception },
-        { path: 'patient', name: 'dashboard-receptioniste-patient', component: PatientReception, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
+        { path: 'patient', name: 'dashboard-receptioniste-patient', component: PatientReception, children: [{ path: ':id', name: 'patient-info-receptioniste-detail', component: PatientInfoPage }] },
         { path: 'doctor', name: 'dashboard-receptioniste-doctor', component: DoctorReception },
         { path: 'appointment', name: 'dashboard-receptioniste-appointment', component: AppointmentReception },
         { path: 'room', name: 'dashboard-receptioniste-room', component: RoomReception },

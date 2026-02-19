@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, handleError } from 'vue'
+import { ref, computed } from 'vue'
 import { deletePatient, patients } from '@/services/patientService'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import PatientFormModal from '@/components/ui/patient/PatientFormModal.vue'

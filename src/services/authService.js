@@ -1,5 +1,5 @@
 
-import { onMounted, ref } from "vue"
+import {ref } from "vue"
 
 /*--------------------------------------------------------
 VARIABLE AUTHENTIFICATION
@@ -16,23 +16,44 @@ export const currentUser = ref(
         : null
 )
 
+
+
+const storedUsers = localStorage.getItem('users')
+
+
+
 /*--------------------------------------------------------
 TABLEAU DES PATIENTS
 ---------------------------------------------------------*/
-export const fakeUsers = ref([
-    { name: 'admin', email: 'admin@admin.com', password: '1234', role: 'admin' },
-    { name: 'doctor', email: 'doctor@doctor.com', password: '12345', role: 'doctor' },
-    { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }
+export const fakeUsers = ref( storedUsers ? JSON.parse(storedUsers) : [
+  {
+    id: Date.now(),
+    name: 'admin',
+    email: 'admin@admin.com',
+    password: '1234',
+    role: 'admin',
+    createdAt: new Date('2024-01-01T10:00:00Z')
+  },
+  {
+    id: Date.now(),
+    name: 'doctor',
+    email: 'doctor@doctor.com',
+    password: '12345',
+    role: 'doctor',
+    createdAt: new Date('2024-01-15T08:30:00Z')
+  },
+  {
+    id: Date.now(),
+    name: 'receptionniste Famous',
+    email: 'reception@reception.com',
+    password: '123456',
+    role: 'receptioniste',
+    createdAt: new Date()
+  }
 ])
 
+localStorage.setItem('users', JSON.stringify(fakeUsers.value))
 console.log(fakeUsers);
-
-
-// Enregistrement et recuperation dans le local storage
-// localStorage.setItem('patients', JSON.stringify(fakeUsers.value))
-// onMounted(() => {
-// fakeUsers.value = localStorage.getItem('patients') ? JSON.parse(localStorage.getItem('patients')) : fakeUsers.value
-// })
 
 
 /*--------------------------------------------------------

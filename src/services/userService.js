@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { fakeUsers } from '@/services/authService' // 🔥 important
+import { fakeUsers } from '@/services/authService'
 
 export const users = ref(
   JSON.parse(localStorage.getItem('users')) || []
@@ -10,24 +10,21 @@ function save() {
 }
 
 export function getUsers() {
-  return users
+  return fakeUsers
 }
 
 export function addUser(user) {
   user.id = Date.now()
   user.createdAt = new Date().toISOString()
 
-  // ✅ Ajout dans users (gestion système)
+  //  Ajout dans users (gestion système)
   users.value.push(user)
   save()
 
-  // 🔥 Ajout automatique dans fakeUsers (pour login)
-  fakeUsers.value.push({
-    name: user.name,
-    email: user.email,
-    password: user.password,
-    role: user.role
-  })
+  //  Ajout automatique dans fakeUsers (pour login)
+  fakeUsers.value.push({ ...user })
+return user
+
 }
 
 export function deleteUser(id) {
@@ -39,7 +36,7 @@ export function deleteUser(id) {
   users.value = users.value.filter(u => u.id !== id)
   save()
 
-  // 🔥 Supprimer aussi dans fakeUsers
+  //  Supprimer aussi dans fakeUsers
   fakeUsers.value = fakeUsers.value.filter(
     u => u.email !== user.email
   )
