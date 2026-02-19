@@ -51,4 +51,22 @@ export function deleteRoom(id) {
   rooms.value = rooms.value.filter(r => r.id !== id)
   saveRooms()
 }
+
+
+export function incrementRoomOccupants(roomNumber) {
+  const room = rooms.value.find(r => r.number === Number(roomNumber))
+  if (room) {
+    room.currentOccupants++
+    saveRooms()
+  }
+}
+
+export function decrementRoomOccupants(roomNumber) {
+  const room = rooms.value.find(r => r.number === Number(roomNumber))
+  if (room && room.currentOccupants > 0) {
+    room.currentOccupants--
+    saveRooms()
+  }
+}
+
 export default {getRooms,defaultRooms}

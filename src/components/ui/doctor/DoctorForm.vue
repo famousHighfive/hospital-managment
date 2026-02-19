@@ -18,7 +18,7 @@ function handleSubmit() {
     available: available.value
   })
 
-  router.push('/doctor')
+  router.push('doctor')
 }
 </script>
 

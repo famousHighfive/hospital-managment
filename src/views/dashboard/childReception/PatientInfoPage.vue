@@ -3,12 +3,25 @@ import { ref, computed } from 'vue'
 import { getPatientById, updatePatient } from '@/services/patientService'
 import { useRoute, useRouter } from 'vue-router'
 import { currentUser } from '@/services/authService'
+import { doctors } from '@/services/doctorService'
 
 const role = computed(() => currentUser.value?.role)
 const route = useRoute()
 const router = useRouter()
 
 const patient = getPatientById(route.params.id)
+
+const getDoctorNameById = (doctorId) => {
+
+  if (!doctorId) return "Non assigné"
+
+  const doctor = doctors.value.find(d => d.id === doctorId)
+
+  if (!doctor) return "Médecin introuvable"
+
+  return `${doctor.name}`
+}
+
 
 const newNote = ref('')
 
@@ -58,7 +71,7 @@ const addNote = () => {
 
         <!-- Header -->
         <div class="flex items-center gap-4 mb-6">
-            <button @click="router.back()" class="text-gray-600 hover:text-black">
+            <button @click="router.back()" class="text-gray-600 cursor-pointer hover:text-black">
                 ← Retour
             </button>
         </div>
@@ -101,7 +114,7 @@ const addNote = () => {
 
                 <div>
                     <p class="text-gray-500 text-sm">Médecin assigné</p>
-                    <p class="font-semibold">{{ patient.doctor }}</p>
+                    <p class="font-semibold">{{ getDoctorNameById(patient.doctorId)}}</p>
                 </div>
 
                 <div>

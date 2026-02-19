@@ -1,4 +1,6 @@
 import { ref } from 'vue'
+import { decrementRoomOccupants, incrementRoomOccupants } from './roomService';
+
 
 // On vérifie si des patients existent déjà en localStorage
 const storedPatients = localStorage.getItem('patients')
@@ -58,6 +60,8 @@ export const patients = ref(
       ],
 )
 
+console.log(patients.value);
+
 
 const saveToLocalStorage = () => {
     localStorage.setItem("patients", JSON.stringify(patients.value))
@@ -65,24 +69,38 @@ const saveToLocalStorage = () => {
 
 
 export const addPatient = (newPatient) => {
-    const newId =
-        patients.value.length > 0
-            ? Math.max(...patients.value.map(p => p.id)) + 1
-            : 1
+  const newId =
+    patients.value.length > 0
+      ? Math.max(...patients.value.map(p => p.id)) + 1
+      : 1
 
-    patients.value.push({
-        id: newId,
-        ...newPatient,
-        createdAt: new Date().toISOString()
-    })
+  const patient = {
+    id: newId,
+    ...newPatient,
+    createdAt: new Date().toISOString()
+  }
 
-    saveToLocalStorage()
+  patients.value.push(patient)
+
+  // ✅ SI hospitalisé → incrémenter chambre
+  if (patient.status === 'Hospitalisé' && patient.room) {
+    incrementRoomOccupants(patient.room)
+  }
+
+  saveToLocalStorage()
 }
 
 
+
 export const deletePatient = (id) => {
-    patients.value = patients.value.filter(p => p.id !== id)
-    saveToLocalStorage()
+  const patient = patients.value.find(p => p.id === id)
+
+  if (patient && patient.status === 'Hospitalisé' && patient.room) {
+    decrementRoomOccupants(patient.room)
+  }
+
+  patients.value = patients.value.filter(p => p.id !== id)
+  saveToLocalStorage()
 }
 
 
@@ -93,14 +111,28 @@ export const getPatientById = (id) => {
 
 
 export const updatePatient = (updatedPatient) => {
-    const index = patients.value.findIndex(p => p.id === updatedPatient.id)
+  const index = patients.value.findIndex(p => p.id === updatedPatient.id)
 
-    if (index !== -1) {
-        patients.value[index] = {
-            ...patients.value[index],
-            ...updatedPatient
-        }
+  if (index !== -1) {
+    const oldPatient = patients.value[index]
 
-        saveToLocalStorage()
+    // ✅ Si ancienne chambre existait → décrémenter
+    if (oldPatient.status === 'Hospitalisé' && oldPatient.room) {
+      decrementRoomOccupants(oldPatient.room)
     }
+
+    patients.value[index] = {
+      ...oldPatient,
+      ...updatedPatient
+    }
+
+    const newPatient = patients.value[index]
+
+    // ✅ Si nouvelle chambre → incrémenter
+    if (newPatient.status === 'Hospitalisé' && newPatient.room) {
+      incrementRoomOccupants(newPatient.room)
+    }
+
+    saveToLocalStorage()
+  }
 }

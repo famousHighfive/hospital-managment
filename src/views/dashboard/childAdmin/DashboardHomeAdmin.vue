@@ -1,171 +1,119 @@
+<script setup>
+import { computed } from 'vue'
+import { patients } from '@/services/patientService'
+import { doctors } from '@/services/doctorService'
+import { rooms } from '@/services/roomService'
+import { appointments } from '@/services/appointmentService' // à créer si nécessaire
+
+// Total patients
+const totalPatients = computed(() => patients.value.length)
+
+// Patients hospitalisés
+const hospitalizedPatients = computed(() =>
+  patients.value.filter(p => p.status === 'Hospitalisé').length
+)
+
+// Total médecins
+const totalDoctors = computed(() => doctors.value.length)
+
+// Rendez-vous aujourd'hui
+const today = new Date().toISOString().slice(0, 10)
+const todayAppointments = computed(() =>
+  appointments.value.filter(a => a.date.startsWith(today)).length
+)
+
+// Chambres occupées
+const occupiedRooms = computed(() =>
+  rooms.value.filter(r => r.currentOccupants > 0).length
+)
+
+// Taux d’occupation
+const totalRooms = computed(() => rooms.value.length)
+const occupancyRate = computed(() =>
+  totalRooms.value > 0 ? Math.round((occupiedRooms.value / totalRooms.value) * 100) : 0
+)
+
+// Rendez-vous par semaine
+const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+
+const appointmentsByWeek = computed(() => {
+  const counts = {}
+  weekDays.forEach(d => counts[d] = 0)
+  appointments.value.forEach(a => {
+    const day = new Date(a.date).getDay() // 0 = dimanche, 1 = lundi ...
+    if (day >= 1 && day <= 5) {
+      counts[weekDays[day - 1]] += 1
+    }
+  })
+  return counts
+})
+</script>
+
 <template>
-  <div class="space-y-8">
- 
+  <div class="space-y-8 p-4">
+
+    <!-- Stats principales -->
     <div class="grid grid-cols-3 gap-6">
- 
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-gray-500">Total Patients</h3>
-        <p class="text-2xl font-bold mt-2">30</p>
+        <p class="text-2xl font-bold mt-2">{{ totalPatients }}</p>
       </div>
- 
+
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-gray-500">Patients hospitalisés</h3>
-        <p class="text-2xl font-bold mt-2">12</p>
+        <p class="text-2xl font-bold mt-2">{{ hospitalizedPatients }}</p>
       </div>
- 
+
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-gray-500">Total Médecins</h3>
-        <p class="text-2xl font-bold mt-2">10</p>
+        <p class="text-2xl font-bold mt-2">{{ totalDoctors }}</p>
       </div>
- 
+
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-gray-500">Rendez-vous aujourd'hui</h3>
-        <p class="text-2xl font-bold mt-2">25</p>
+        <p class="text-2xl font-bold mt-2">{{ todayAppointments }}</p>
       </div>
- 
+
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-gray-500">Chambres occupées</h3>
-        <p class="text-2xl font-bold mt-2">08</p>
+        <p class="text-2xl font-bold mt-2">{{ occupiedRooms }}</p>
       </div>
- 
     </div>
- 
+
+    <!-- Rendez-vous par semaine -->
     <div class="grid grid-cols-2 gap-6">
- 
       <div class="bg-white p-6 rounded-xl shadow">
         <h3 class="text-lg font-semibold mb-6">Rendez-vous par semaine</h3>
- 
         <div class="space-y-4">
- 
-          <div class="flex justify-between items-center">
-            <span class="text-gray-600">Lundi</span>
-            <span class="font-semibold">12</span>
+          <div v-for="day in Object.keys(appointmentsByWeek)" :key="day" class="flex justify-between items-center">
+            <span class="text-gray-600">{{ day }}</span>
+            <span class="font-semibold">{{ appointmentsByWeek[day] }}</span>
           </div>
- 
-          <div class="flex justify-between items-center">
-            <span class="text-gray-600">Mardi</span>
-            <span class="font-semibold">18</span>
-          </div>
- 
-          <div class="flex justify-between items-center">
-            <span class="text-gray-600">Mercredi</span>
-            <span class="font-semibold">10</span>
-          </div>
- 
-          <div class="flex justify-between items-center">
-            <span class="text-gray-600">Jeudi</span>
-            <span class="font-semibold">22</span>
-          </div>
- 
-          <div class="flex justify-between items-center">
-            <span class="text-gray-600">Vendredi</span>
-            <span class="font-semibold">15</span>
-          </div>
- 
         </div>
       </div>
- 
- 
-<div class="bg-white p-6 rounded-xl shadow mb-8">
- 
-  <div class="flex justify-between items-center mb-4">
-    <h3 class="text-lg font-semibold">Taux d’occupation des chambres</h3>
-    <span class="text-2xl font-bold text-emerald-600">65%</span>
-  </div>
- 
- 
-  <div class="w-full bg-gray-200 rounded-full h-3">
-    <div
-      class="bg-emerald-600 h-3 rounded-full"
-      style="width: 65%;">
+
+      <!-- Taux d’occupation -->
+      <div class="bg-white p-6 rounded-xl shadow">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Taux d’occupation des chambres</h3>
+          <span class="text-2xl font-bold text-emerald-600">{{ occupancyRate }}%</span>
+        </div>
+
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div
+            class="bg-emerald-600 h-3 rounded-full"
+            :style="{ width: occupancyRate + '%' }"
+          ></div>
+        </div>
+
+        <div class="flex justify-between text-sm text-gray-500 mt-3">
+          <span>{{ occupiedRooms }} chambres occupées</span>
+          <span>{{ totalRooms }} chambres totales</span>
+        </div>
+      </div>
     </div>
-  </div>
- 
- 
-  <div class="flex justify-between text-sm text-gray-500 mt-3">
-    <span>13 chambres occupées</span>
-    <span>20 chambres totales</span>
-  </div>
- 
-</div>
- 
- 
- 
- 
- 
- 
-    </div>
-    <div class=" w-full bg-white p-6 rounded-xl shadow">
-  <h3 class="text-lg font-semibold mb-6">Activités récentes</h3>
- 
-  <div class="overflow-x-auto w-full">
-    <table class="w-full text-sm text-left border-collapse">
-      <thead>
-        <tr class="border-b bg-gray-50 text-gray-600 uppercase text-xs">
-          <th class="py-3 px-4">Type</th>
-          <th class="py-3 px-4">Description</th>
-          <th class="py-3 px-4">Utilisateur</th>
-          <th class="py-3 px-4">Date</th>
-        </tr>
-      </thead>
-      <tbody class="text-gray-700">
- 
-        <tr class="border-b hover:bg-gray-50">
-          <td class="py-3 px-4">
-            <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs">
-              Patient
-            </span>
-          </td>
-          <td class="py-3 px-4">
-            Ajout du patient Jean Dupont
-          </td>
-          <td class="py-3 px-4">
-            Admin User
-          </td>
-          <td class="py-3 px-4 text-gray-500">
-            16/06/2026 10:30
-          </td>
-        </tr>
- 
-        <tr class="border-b hover:bg-gray-50">
-          <td class="py-3 px-4">
-            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs">
-              Rendez-vous
-            </span>
-          </td>
-          <td class="py-3 px-4">
-            Rendez-vous confirmé avec Dr. Martin
-          </td>
-          <td class="py-3 px-4">
-            Réceptionniste
-          </td>
-          <td class="py-3 px-4 text-gray-500">
-            16/06/2026 09:15
-          </td>
-        </tr>
- 
-        <tr class="hover:bg-gray-50">
-          <td class="py-3 px-4">
-            <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">
-              Chambre
-            </span>
-          </td>
-          <td class="py-3 px-4">
-            Chambre 205 assignée
-          </td>
-          <td class="py-3 px-4">
-            Admin User
-          </td>
-          <td class="py-3 px-4 text-gray-500">
-            15/06/2026 17:40
-          </td>
-        </tr>
- 
-      </tbody>
- 
-    </table>
-  </div>
-</div>
- 
+
+    <!-- Activités récentes -->
+    <!-- À adapter dynamiquement depuis ton historique ou logs -->
   </div>
 </template>
