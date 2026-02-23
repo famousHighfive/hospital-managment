@@ -1,5 +1,6 @@
 
 import DoctorForm from '@/components/ui/doctor/DoctorForm.vue'
+import ReceptionForm from '@/components/ui/reception/ReceptionForm.vue'
 import AssignPatientModal from '@/components/ui/room/AssignPatientModal.vue'
 import RoomForm from '@/components/ui/room/RoomForm.vue'
 import { currentUser, isAuth } from '@/services/authService'
@@ -8,6 +9,7 @@ import AppointmentAdmin from '@/views/dashboard/childAdmin/AppointmentAdmin.vue'
 import DashboardHomeAdmin from '@/views/dashboard/childAdmin/DashboardHomeAdmin.vue'
 import DoctorAdmin from '@/views/dashboard/childAdmin/DoctorAdmin.vue'
 import PatientAdmin from '@/views/dashboard/childAdmin/PatientAdmin.vue'
+import ReceptionistAdmin from '@/views/dashboard/childAdmin/ReceptionistAdmin.vue'
 import RoomAdmin from '@/views/dashboard/childAdmin/RoomAdmin.vue'
 import UsersAdmin from '@/views/dashboard/childAdmin/UsersAdmin.vue'
 import AppointmentDoctor from '@/views/dashboard/childDoctor/AppointmentDoctor.vue'
@@ -41,8 +43,9 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
       children: [
         { path: '', name: 'dashboard-admin-home', component: DashboardHomeAdmin },
-        { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
+        { path: 'patient', name: 'dashboard-admin-patient', component: PatientAdmin, children: [{ path: ':id', name: 'patient-info-admin-detail', component: PatientInfoPage }] },
         { path: 'doctor', name: 'dashboard-admin-doctor', component: DoctorAdmin },
+        { path: 'receptionist', name: 'dashboard-admin-receptionist', component: ReceptionistAdmin},
         { path: 'appointment', name: 'dashboard-admin-appointment', component: AppointmentAdmin },
         { path: 'room', name: 'dashbord-admin-room', component: RoomAdmin },
         { path: 'users', name: 'dashboard-admin-users', component: UsersAdmin },
@@ -52,7 +55,11 @@ const router = createRouter({
         },
         {
           path: 'dashboard-admin-room-create', name: 'dashboard-admin-room-create', component: RoomForm
- }]
+ },
+    {
+          path: 'dashboard-admin-receptionist-create', name: 'dashboard-admin-receptionist-create', component: ReceptionForm
+ },
+]
     },
     {
       path: '/dashboard-doctor',
@@ -61,7 +68,7 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'doctor' },
       children: [
         { path: '', name: 'dashboard-doctor-home', component: DashboardHomeDoctor },
-        { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor },
+        { path: 'patient', name: 'dashboard-doctor-patient', component: PatientDoctor, children: [{ path: ':id', name: 'patient-info-doctor-detail', component: PatientInfoPage }] },
         { path: 'appointment', name: 'dashboard-doctor-appointment', component: AppointmentDoctor },
       ]
     },
@@ -72,10 +79,11 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'receptioniste' },
       children: [
         { path: '', name: 'dashboard-receptioniste-home', component: DashboardHomeReception },
-        { path: 'patient', name: 'dashboard-receptioniste-patient', component: PatientReception, children: [{ path: ':id', name: 'patient-info-detail', component: PatientInfoPage }] },
+        { path: 'patient', name: 'dashboard-receptioniste-patient', component: PatientReception, children: [{ path: ':id', name: 'patient-info-receptioniste-detail', component: PatientInfoPage }] },
         { path: 'doctor', name: 'dashboard-receptioniste-doctor', component: DoctorReception },
         { path: 'appointment', name: 'dashboard-receptioniste-appointment', component: AppointmentReception },
         { path: 'room', name: 'dashboard-receptioniste-room', component: RoomReception },
+        { path: 'assign-patient', name: 'assign-patient', component: AssignPatientModal},
       ]
     },
     {

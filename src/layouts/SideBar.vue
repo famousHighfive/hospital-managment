@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { currentUser, logout } from '@/services/authService'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 const router = useRouter()
 const role = computed(() => currentUser.value?.role)
@@ -21,9 +22,32 @@ const routePath = (child) => {
 }
 
 const disconnect = () => {
-  logout()
-  router.replace('/')
-}
+  Swal.fire({
+    title: "Déconnexion",
+    text: "Êtes-vous sûr de vouloir vous déconnecter ?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#198754",
+    confirmButtonText: "Oui, me déconnecter",
+    cancelButtonText: "Rester connecté"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      logout(); // Ta fonction de nettoyage (clear token, etc.)
+      router.replace('/'); // Redirection
+
+      // Petit toast de succès (optionnel)
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Déconnecté avec succès',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+  });
+};
 </script>
 
 
@@ -94,6 +118,21 @@ const disconnect = () => {
           <span>Médecins</span>
         </router-link>
 
+        <router-link :to="routePath('receptionist')" v-if="role === 'admin'"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-stethoscope"
+              data-fg-dqpt2="2.27:2.2865:/src/app/components/Sidebar.tsx:39:11:778:25:e:Stethoscope::::::DCwV">
+              <path d="M11 2v2"></path>
+              <path d="M5 2v2"></path>
+              <path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"></path>
+              <path d="M8 15a6 6 0 0 0 12 0v-3"></path>
+              <circle cx="20" cy="10" r="2"></circle>
+            </svg></span>
+          <span>Réceptioniste</span>
+        </router-link>
+
         <router-link :to="routePath('appointment')" v-if="role"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -108,7 +147,7 @@ const disconnect = () => {
           <span>Rendez-vous</span>
         </router-link>
 
-        
+
         <router-link :to="routePath('room')" v-if="role !== 'doctor'"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"

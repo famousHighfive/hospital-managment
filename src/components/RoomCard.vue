@@ -66,10 +66,12 @@ const percentage = (room) => {
   name: 'assign-patient', 
   query: { roomId: room.id } 
 })"
+
   class="w-full block bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition text-center"
 >
   Assigner Patient
 </button>
+
 
   </div>
 </template>

@@ -50,7 +50,7 @@ const confirmedAppointments = computed(() =>
 const totalRooms = computed(() => rooms.value.length)
 
 const occupiedRooms = computed(() =>
-  rooms.value.filter(r => r.status === 'Occupée').length
+  rooms.value.filter(r => r.currentOccupants > 0).length
 )
 
 const roomOccupationRate = computed(() => {

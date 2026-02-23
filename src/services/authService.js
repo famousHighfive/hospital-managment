@@ -1,6 +1,6 @@
 
-import { onMounted, ref } from "vue"
-
+import { ref } from "vue"
+import { users } from "./userService"
 /*--------------------------------------------------------
 VARIABLE AUTHENTIFICATION
 ---------------------------------------------------------*/
@@ -16,20 +16,16 @@ export const currentUser = ref(
         : null
 )
 
+// const storedFakeUsers = localStorage.getItem('users')
 /*--------------------------------------------------------
 TABLEAU DES PATIENTS
 ---------------------------------------------------------*/
-export const fakeUsers = ref([
-    { name: 'admin', email: 'admin@admin.com', password: '1234', role: 'admin' },
-    { name: 'doctor', email: 'doctor@doctor.com', password: '12345', role: 'doctor' },
-    { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }
-])
+// export const fakeUsers = ref( storedFakeUsers ? JSON.parse(storedFakeUsers) : [
+//     { name: 'admin', email: 'admin@admin.com', password: '1234', role: 'admin' },
+//     { name: 'doctor', email: 'doctor@doctor.com', password: '12345', role: 'doctor' },
+//     { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }
+// ])
 
-// Enregistrement et recuperation dans le local storage
-// localStorage.setItem('patients', JSON.stringify(fakeUsers.value))
-// onMounted(() => {
-// fakeUsers.value = localStorage.getItem('patients') ? JSON.parse(localStorage.getItem('patients')) : fakeUsers.value
-// })
 
 
 /*--------------------------------------------------------
@@ -40,7 +36,7 @@ export const login = (mail, pass) => {
         return { success: false, message: 'Champs vide...' }
     }
 
-    const foundUser = fakeUsers.value.find(u => u.email === mail && u.password === pass)
+    const foundUser = users.value.find(u => u.email === mail && u.password === pass)
 
     if (foundUser) {
         localStorage.setItem('auth', 'true')

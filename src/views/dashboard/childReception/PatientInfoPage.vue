@@ -2,11 +2,26 @@
 import { ref, computed } from 'vue'
 import { getPatientById, updatePatient } from '@/services/patientService'
 import { useRoute, useRouter } from 'vue-router'
+import { currentUser } from '@/services/authService'
+import { doctors } from '@/services/doctorService'
 
+const role = computed(() => currentUser.value?.role)
 const route = useRoute()
 const router = useRouter()
 
 const patient = getPatientById(route.params.id)
+
+const getDoctorNameById = (doctorId) => {
+
+  if (!doctorId) return "Non assigné"
+
+  const doctor = doctors.value.find(d => d.id === doctorId)
+
+  if (!doctor) return "Médecin introuvable"
+
+  return `${doctor.name}`
+}
+
 
 const newNote = ref('')
 
@@ -24,15 +39,6 @@ const statusClass = computed(() => {
     }
 })
 
-// Simulation rendez-vous (plus tard tu pourras connecter au vrai service)
-const appointments = ref([
-    {
-        doctor: patient?.doctor,
-        date: '16/02/2026',
-        time: '14:00',
-        status: 'En attente'
-    }
-])
 
 const addNote = () => {
     if (!newNote.value.trim()) return
@@ -56,7 +62,7 @@ const addNote = () => {
 
         <!-- Header -->
         <div class="flex items-center gap-4 mb-6">
-            <button @click="router.back()" class="text-gray-600 hover:text-black">
+            <button @click="router.back()" class="text-gray-600 cursor-pointer hover:text-black">
                 ← Retour
             </button>
         </div>
@@ -99,7 +105,7 @@ const addNote = () => {
 
                 <div>
                     <p class="text-gray-500 text-sm">Médecin assigné</p>
-                    <p class="font-semibold">{{ patient.doctor }}</p>
+                    <p class="font-semibold">{{ getDoctorNameById(patient.doctorId)}}</p>
                 </div>
 
                 <div>
@@ -117,36 +123,8 @@ const addNote = () => {
             </div>
         </div>
 
-        <!-- Historique des rendez-vous -->
-        <div class="bg-white rounded-2xl shadow p-8 mb-8">
-            <h2 class="text-xl font-semibold mb-6">Historique des rendez-vous</h2>
-
-            <table class="w-full text-left">
-                <thead class="border-b">
-                    <tr>
-                        <th class="pb-3">Médecin</th>
-                        <th>Date</th>
-                        <th>Heure</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(a, index) in appointments" :key="index" class="border-b last:border-none">
-                        <td class="py-4">{{ a.doctor }}</td>
-                        <td>{{ a.date }}</td>
-                        <td>{{ a.time }}</td>
-                        <td>
-                            <span class="px-3 py-1 rounded-lg text-sm border border-orange-400 text-orange-600">
-                                {{ a.status }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
         <!-- Notes médicales -->
-        <div class="bg-white rounded-2xl shadow p-8">
+        <div v-if="role === 'doctor'" class="bg-white rounded-2xl shadow p-8">
             <h2 class="text-xl font-semibold mb-6">Notes médicales</h2>
 
             <div class="mb-4">
