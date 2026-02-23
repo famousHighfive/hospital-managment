@@ -1,27 +1,83 @@
-import { onMounted, ref } from 'vue'
+import Swal from 'sweetalert2'
+import { ref } from 'vue'
 
-// Tableau réactif pour stocker tous les RDV
-export const appointments = ref([
-    { id: 1, patientId: 1, doctorId: 1, date: '2023-10-25', time: '10:00', status: 'Confirmé' },
-    { id: 2, patientId: 2, doctorId: 3, date: '2023-10-26', time: '14:30', status: 'En attente' }
-])
+const storedAppointment = localStorage.getItem('rdv')
+
+
+export const appointments = ref(
+    storedAppointment ? JSON.parse(storedAppointment) : [])
 
 // Enregistrement et recuperation dans le local storage
-localStorage.setItem('rdv', JSON.stringify(appointments.value))
-onMounted(() => {
-    appointments.value = localStorage.getItem('rdv') ? JSON.parse(localStorage.getItem('rdv')) : appointments.value
-})
+const saveToLocalStorage = () => {
+    localStorage.setItem('rdv', JSON.stringify(appointments.value))
+}
+
 
 // Fonction pour ajouter un RDV
 export const addAppointment = (data) => {
+
+    const newId =
+        appointments.value.length > 0
+            ? Math.max(...appointments.value.map((p) => p.id)) + 1
+            : 1
+
     const newAppointment = {
-        id: Date.now(), // ID unique
+        id: newId, // ID unique
         ...data
     }
     appointments.value.push(newAppointment)
+
+    saveToLocalStorage()
 }
 
 // Fonction pour supprimer
 export const deleteAppointment = (id) => {
-    appointments.value = appointments.value.filter(app => app.id !== id)
+    const rdv = appointments.value.find(a => a.id === id)
+    if (!rdv) return
+
+    Swal.fire({
+        title: "Supprimer ce rendez-vous ?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Oui",
+        cancelButtonText: "Non"
+    }).then(result => {
+        if (result.isConfirmed) {
+            appointments.value = appointments.value.filter(a => a.id !== id)
+            saveToLocalStorage()
+
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Rendez-vous supprimé',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        }
+    })
 }
+// ✅ Fonction pour modifier un RDV
+export const updateAppointment = (updatedData) => {
+
+    const index = appointments.value.findIndex(a => a.id === updatedData.id)
+    if (index === -1) return
+
+    appointments.value[index] = {
+        ...appointments.value[index],
+        ...updatedData
+    }
+
+    saveToLocalStorage()
+
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Rendez-vous modifié avec succès',
+        showConfirmButton: false,
+        timer: 1500
+    })
+}
+
+

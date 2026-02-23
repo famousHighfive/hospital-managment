@@ -1,17 +1,50 @@
 <script setup>
-import { ref, computed, handleError } from 'vue'
+import { ref, computed } from 'vue'
 import { deletePatient, patients } from '@/services/patientService'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import PatientFormModal from '@/components/ui/patient/PatientFormModal.vue'
+import { doctors } from '@/services/doctorService'
 
 const search = ref('')
 const showAddModal = ref(false)
+const editingPatient = ref(null)
+const statusFilter = ref('Tous')
+
+
 
 const filteredPatients = computed(() => {
-    return patients.value.filter(p =>
-        p.firstName.toLowerCase().includes(search.value.toLowerCase()) || p.lastName.toLowerCase().includes(search.value.toLowerCase())
-    )
+    const searchValue = search.value?.toLowerCase() || ''
+
+    return patients.value.filter(p => {
+
+        const firstName = p?.firstName?.toLowerCase() || ''
+        const lastName = p?.lastName?.toLowerCase() || ''
+
+        const matchesSearch =
+            firstName.includes(searchValue) ||
+            lastName.includes(searchValue)
+
+        const matchesStatus =
+            statusFilter.value === 'Tous' ||
+            p?.status === statusFilter.value
+
+        return matchesSearch && matchesStatus
+    })
 })
+
+
+/* --------------------------
+   EDIT
+--------------------------- */
+const handleEdit = (patient) => {
+    editingPatient.value = patient
+    showAddModal.value = true
+}
+
+const getDoctorName = (id) => {
+    const d = doctors.value.find(d => d.id === id)
+    return d ? d.name : 'Inconnu'
+}
 
 const handleDelete = (id) => {
     deletePatient(id)
@@ -32,24 +65,35 @@ const handleDelete = (id) => {
             </div>
 
             <button @click="showAddModal = true"
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                class="flex items-center gap-2 bg-[#108565] text-white px-5 py-2.5 rounded-lg hover:bg-[#0d6d53] transition shadow-md font-semibold">
                 + Ajouter Patient
             </button>
         </div>
 
-        <!-- Search -->
-        <div class="mb-4">
-            <!-- <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                    data-fg-do8g97="2.51:2.13127:/src/app/pages/PatientsPage.tsx:240:13:9812:105:e:Search::::::B9rK">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.3-4.3"></path>
-                </svg>
-            </span> -->
-            <input v-model="search" type="text" placeholder="Rechercher un patient..."
-                class="w-full p-3 border rounded-lg" />
+        <!-- Search & Filter Section -->
+        <div class="bg-white p-4 rounded-xl shadow mb-6">
+
+            <div class="grid md:grid-cols-3 gap-4">
+
+                <!-- Recherche -->
+                <div class="col-span-2">
+                    <input v-model="search" type="text" placeholder="Rechercher un patient par nom..."
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
+                </div>
+
+                <!-- Filtre par statut -->
+                <div>
+                    <select v-model="statusFilter"
+                        class="w-full p-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <option value="Tous">Tous les statuts</option>
+                        <option value="Hospitalisé">Hospitalisé</option>
+                        <option value="En consultation">En consultation</option>
+                        <option value="Sorti">Sorti</option>
+                    </select>
+                </div>
+
+            </div>
+
         </div>
 
         <!-- Table -->
@@ -76,7 +120,7 @@ const handleDelete = (id) => {
                         <td>{{ p.gender }}</td>
                         <td>{{ p.phone }}</td>
                         <td>{{ p.bloodGroup }}</td>
-                        <td>{{ p.doctor }}</td>
+                        <td>{{ getDoctorName(p.doctorId) }}</td>
                         <td>{{ p.room }}</td>
                         <td>
                             <span class="px-3 py-1 text-sm rounded-full" :class="{
@@ -88,9 +132,10 @@ const handleDelete = (id) => {
                             </span>
                         </td>
                         <td class="space-x-2">
-                            <button @click="$router.push({ name: 'patient-info-detail', params: { id: p.id } })"
+                            <button
+                                @click="$router.push({ name: 'patient-info-receptioniste-detail', params: { id: p.id } })"
                                 class="cursor-pointer">👁</button>
-                            <button class="cursor-pointer">✏️</button>
+                            <button @click="handleEdit(p)" class="cursor-pointer">✏️</button>
                             <button @click="handleDelete(p.id)" class="cursor-pointer">🗑</button>
                         </td>
                     </tr>
@@ -100,7 +145,7 @@ const handleDelete = (id) => {
 
         <!-- Modal Ajouter -->
         <BaseModal v-model="showAddModal">
-            <PatientFormModal @close="showAddModal = false" />
+            <PatientFormModal :patient="editingPatient" @close="showAddModal = false" />
         </BaseModal>
 
     </div>

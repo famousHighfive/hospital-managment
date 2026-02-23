@@ -20,7 +20,6 @@ const filteredDoctors = computed(() => {
 
 <template>
     <div class="p-8 bg-gray-50 min-h-screen">
-        <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Annuaire Médical</h1>
@@ -35,7 +34,6 @@ const filteredDoctors = computed(() => {
             </div>
         </div>
 
-        <!-- Search -->
         <div class="mb-4">
             <input v-vee-model="search" v-model="search" type="text" 
                 placeholder="Rechercher par nom ou spécialité..."
@@ -73,7 +71,6 @@ const filteredDoctors = computed(() => {
                             <button class="text-gray-500 hover:text-gray-700 p-1" title="Contacter">📞</button>
                         </td>
                     </tr>
-                    <!-- Message si aucun résultat -->
                     <tr v-if="filteredDoctors.length === 0">
                         <td colspan="5" class="p-8 text-center text-gray-400 italic">
                             Aucun médecin trouvé pour cette recherche.
