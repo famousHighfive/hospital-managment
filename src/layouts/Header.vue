@@ -1,7 +1,20 @@
 <script setup>
 import { currentUser } from '@/services/authService';
+import { onMounted, ref } from 'vue';
 
+const userInitial = () => {
+  let fullName = currentUser.value.name.split(" ")
 
+  let output = []
+  for (let index = 0; index < fullName.length; index++) {
+    output.push(fullName[index][0])
+  }
+  return output.join("").toUpperCase()
+}
+onMounted(() => {
+  userInitial()
+})
+let inital = ref(userInitial())
 
 
 </script>
@@ -11,9 +24,9 @@ import { currentUser } from '@/services/authService';
 
     <!-- Left -->
     <div class="flex items-center gap-4">
-      <button class="text-gray-500 hover:text-gray-700">
+      <!-- <button class="text-gray-500 hover:text-gray-700">
         🌙
-      </button>
+      </button> -->
     </div>
 
     <!-- Right -->
@@ -28,7 +41,7 @@ import { currentUser } from '@/services/authService';
       </div>
 
       <div class="w-10 h-10 bg-emerald-600 text-white flex items-center justify-center rounded-full font-semibold">
-        AU
+        {{ inital }}
       </div>
     </div>
   </header>

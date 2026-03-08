@@ -8,6 +8,22 @@ import FormAppointment from '@/components/form/FormAppointment.vue'
 
 const showModal = ref(false) // On utilise cette variable partout
 const search = ref('')
+const statusFilter = ref('') // <-- nouveau filtre
+
+const filteredAppointments = computed(() => {
+    return appointments.value.filter(app => {
+
+        const patientMatch =
+            getPatientName(app.patientId)
+                .toLowerCase()
+                .includes(search.value.toLowerCase())
+
+        const statusMatch =
+            !statusFilter.value || app.status === statusFilter.value
+
+        return patientMatch && statusMatch
+    })
+})
 
 const getPatientName = (id) => {
     const p = patients.value.find(p => p.id === id)
@@ -18,12 +34,12 @@ const getDoctorName = (id) => {
     const d = doctors.value.find(d => d.id === id)
     return d ? d.name : 'Inconnu'
 }
+const selectedAppointment = ref(null)
 
-const filteredAppointments = computed(() => {
-    return appointments.value.filter(app =>
-        getPatientName(app.patientId).toLowerCase().includes(search.value.toLowerCase())
-    )
-})
+const editAppointment = (rdv) => {
+    selectedAppointment.value = rdv
+    showModal.value = true
+}
 </script>
 
 <template>
@@ -40,10 +56,22 @@ const filteredAppointments = computed(() => {
             </button>
         </div>
 
-        <!-- Recherche -->
-        <div class="mb-4">
+        <!-- Recherche + Filtre -->
+        <div class="mb-6 flex flex-col md:flex-row gap-4">
+
+            <!-- Recherche -->
             <input v-model="search" type="text" placeholder="Rechercher un patient..."
-                class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-green-500" />
+                class="flex-1 p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-green-500" />
+
+            <!-- Filtre statut -->
+            <select v-model="statusFilter"
+                class="p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-green-500">
+                <option value="">Tous les statuts</option>
+                <option value="Confirmé">Confirmé</option>
+                <option value="En attente">En attente</option>
+                <option value="Annulé">Annulé</option>
+            </select>
+
         </div>
 
         <!-- Table -->
@@ -74,8 +102,15 @@ const filteredAppointments = computed(() => {
                             }">{{ rdv.status }}</span>
                         </td>
                         <td class="p-4">
+                                <button 
+        @click="editAppointment(rdv)"
+        class="text-blue-500 hover:text-blue-700"
+    >
+        ✏️
+    </button>
+
                             <button @click="deleteAppointment(rdv.id)"
-                                class="text-red-500 hover:text-red-700">🗑</button>
+                                class="text-red-500 cursor-pointer hover:text-red-700">🗑</button>
                         </td>
                     </tr>
                 </tbody>
@@ -83,8 +118,11 @@ const filteredAppointments = computed(() => {
         </div>
 
 
-        <BaseModal v-model="showModal">
-            <FormAppointment @close="showModal = false" />
-        </BaseModal>
+      <BaseModal v-model="showModal">
+    <FormAppointment 
+        :appointment="selectedAppointment"
+        @close="showModal = false; selectedAppointment = null"
+    />
+</BaseModal>
     </div>
 </template>

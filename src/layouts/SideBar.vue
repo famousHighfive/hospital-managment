@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { currentUser, logout } from '@/services/authService'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 const router = useRouter()
 const role = computed(() => currentUser.value?.role)
@@ -21,9 +22,32 @@ const routePath = (child) => {
 }
 
 const disconnect = () => {
-  logout()
-  router.replace('/')
-}
+  Swal.fire({
+    title: "Déconnexion",
+    text: "Êtes-vous sûr de vouloir vous déconnecter ?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#198754",
+    confirmButtonText: "Oui, me déconnecter",
+    cancelButtonText: "Rester connecté"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      logout(); // Ta fonction de nettoyage (clear token, etc.)
+      router.replace('/'); // Redirection
+
+      // Petit toast de succès (optionnel)
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Déconnecté avec succès',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+  });
+};
 </script>
 
 
@@ -123,7 +147,7 @@ const disconnect = () => {
           <span>Rendez-vous</span>
         </router-link>
 
-        
+
         <router-link :to="routePath('room')" v-if="role !== 'doctor'"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"

@@ -61,19 +61,13 @@ function handleSubmit() {
 
     <div class="mb-4">
       <label class="block text-sm text-gray-600 mb-1">Nom complet</label>
-      <input
-        v-model="name"
-        placeholder="Nom complet"
-        class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-      />
+      <input v-model="name" placeholder="Nom complet"
+        class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
     </div>
 
     <div class="mb-4">
       <label class="block text-sm text-gray-600 mb-1">Spécialité</label>
-      <select
-        v-model="speciality"
-        class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-      >
+      <select v-model="speciality" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
         <option disabled value="">Choisir une spécialité</option>
         <option v-for="spec in medicalSpecialities" :key="spec" :value="spec">
           {{ spec }}
@@ -83,37 +77,25 @@ function handleSubmit() {
 
     <div class="mb-4">
       <label class="block text-sm text-gray-600 mb-1">Téléphone</label>
-      <input
-        v-model="phone"
-        placeholder="Téléphone"
-        class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-      />
+      <input v-model="phone" placeholder="Téléphone"
+        class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
     </div>
 
     <div class="mb-6">
       <label class="block text-sm text-gray-600 mb-1">Disponibilité</label>
-      <select
-        v-model="available"
-        class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-      >
+      <select v-model="available" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
         <option :value="true">Disponible</option>
         <option :value="false">Indisponible</option>
       </select>
     </div>
 
     <div class="flex gap-2">
-      <button
-        @click="handleSubmit"
-        class="flex-1 py-2 rounded-lg text-white font-medium"
-        :class="isEdit ? 'bg-green-300 hover:bg-green-500' : 'bg-green-600 hover:bg-green-700'"
-      >
+      <button @click="handleSubmit" class="flex-1 py-2 rounded-lg text-white font-medium"
+        :class="isEdit ? 'bg-green-300 hover:bg-green-500' : 'bg-green-600 hover:bg-green-700'">
         {{ isEdit ? 'Mettre à jour' : 'Enregistrer' }}
       </button>
 
-      <button
-        @click="emit('close')"
-        class="flex-1 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 font-medium"
-      >
+      <button @click="emit('close')" class="flex-1 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 font-medium">
         Annuler
       </button>
     </div>

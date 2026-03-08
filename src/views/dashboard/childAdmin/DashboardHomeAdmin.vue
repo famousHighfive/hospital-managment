@@ -34,7 +34,7 @@ const occupancyRate = computed(() =>
 )
 
 // Rendez-vous par semaine
-const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
 
 const appointmentsByWeek = computed(() => {
   const counts = {}
@@ -75,7 +75,7 @@ const appointmentsByWeek = computed(() => {
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-gray-500">Chambres occupées</h3>
+        <h3 class="text-gray-500">Lits occupés</h3>
         <p class="text-2xl font-bold mt-2">{{ occupiedRooms }}</p>
       </div>
     </div>
@@ -100,10 +100,7 @@ const appointmentsByWeek = computed(() => {
         </div>
 
         <div class="w-full bg-gray-200 rounded-full h-3">
-          <div
-            class="bg-emerald-600 h-3 rounded-full"
-            :style="{ width: occupancyRate + '%' }"
-          ></div>
+          <div class="bg-emerald-600 h-3 rounded-full" :style="{ width: occupancyRate + '%' }"></div>
         </div>
 
         <div class="flex justify-between text-sm text-gray-500 mt-3">

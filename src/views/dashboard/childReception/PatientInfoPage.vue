@@ -39,15 +39,6 @@ const statusClass = computed(() => {
     }
 })
 
-// Simulation rendez-vous (plus tard tu pourras connecter au vrai service)
-const appointments = ref([
-    {
-        doctor: patient?.doctor,
-        date: '16/02/2026',
-        time: '14:00',
-        status: 'En attente'
-    }
-])
 
 const addNote = () => {
     if (!newNote.value.trim()) return
@@ -130,34 +121,6 @@ const addNote = () => {
                 </div>
 
             </div>
-        </div>
-
-        <!-- Historique des rendez-vous -->
-        <div class="bg-white rounded-2xl shadow p-8 mb-8">
-            <h2 class="text-xl font-semibold mb-6">Historique des rendez-vous</h2>
-
-            <table class="w-full text-left">
-                <thead class="border-b">
-                    <tr>
-                        <th class="pb-3">Médecin</th>
-                        <th>Date</th>
-                        <th>Heure</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(a, index) in appointments" :key="index" class="border-b last:border-none">
-                        <td class="py-4">{{ a.doctor }}</td>
-                        <td>{{ a.date }}</td>
-                        <td>{{ a.time }}</td>
-                        <td>
-                            <span class="px-3 py-1 rounded-lg text-sm border border-orange-400 text-orange-600">
-                                {{ a.status }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
 
         <!-- Notes médicales -->

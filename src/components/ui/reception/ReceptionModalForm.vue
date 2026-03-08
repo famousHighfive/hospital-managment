@@ -68,6 +68,7 @@ function handleSubmit() {
       <label class="block text-sm text-gray-600 mb-1">Téléphone</label>
       <input
         v-model="phone"
+        type="number"
         placeholder="Téléphone"
         class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
       />

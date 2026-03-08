@@ -1,16 +1,21 @@
 import { ref } from 'vue'
-import { fakeUsers } from '@/services/authService'
+// import { fakeUsers } from '@/services/authService'
 
-export const users = ref(
-  JSON.parse(localStorage.getItem('users')) || []
-)
+const storedUsers = localStorage.getItem('users')
+
+export const users = ref(storedUsers ?
+  JSON.parse(storedUsers) : [
+    { name: 'admin', email: 'admin@admin.com', password: '1234', role: 'admin' },
+    { name: 'doctor', email: 'doctor@doctor.com', password: '12345', role: 'doctor' },
+    { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }
+  ])
 
 function save() {
   localStorage.setItem('users', JSON.stringify(users.value))
 }
 
 export function getUsers() {
-  return fakeUsers
+  return users
 }
 
 export function addUser(user) {
@@ -22,8 +27,8 @@ export function addUser(user) {
   save()
 
   //  Ajout automatique dans fakeUsers (pour login)
-  fakeUsers.value.push({ ...user })
-return user
+  // fakeUsers.value.push({ ...user })
+  return user
 
 }
 
@@ -37,7 +42,7 @@ export function deleteUser(id) {
   save()
 
   //  Supprimer aussi dans fakeUsers
-  fakeUsers.value = fakeUsers.value.filter(
-    u => u.email !== user.email
-  )
+  // fakeUsers.value = fakeUsers.value.filter(
+  // u => u.email !== user.email
+  // )
 }

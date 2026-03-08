@@ -41,7 +41,7 @@ function handleCloseModal() {
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">Gestion des Réceptionnistes</h2>
       <button
-        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+        class="flex items-center gap-2 bg-[#108565] text-white px-5 py-2.5 rounded-lg hover:bg-[#0d6d53] transition shadow-md font-semibold"
         @click="showModal = true"
       >
         + Ajouter Réceptionniste

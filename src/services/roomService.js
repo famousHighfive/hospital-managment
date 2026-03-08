@@ -2,11 +2,11 @@
 import { ref } from 'vue'
 export const selectedRoom = ref(null)
  const defaultRooms = [
-  { id: 1, number: 101, capacity: 2, currentOccupants: 1 },
-  { id: 2, number: 102, capacity: 2, currentOccupants: 1 },
-  { id: 3, number: 103, capacity: 1, currentOccupants: 1 },
+  { id: 1, number: 101, capacity: 2, currentOccupants: 0 },
+  { id: 2, number: 102, capacity: 9, currentOccupants: 0 },
+  { id: 3, number: 103, capacity: 1, currentOccupants: 0 },
   { id: 4, number: 104, capacity: 2, currentOccupants: 0 },
-  { id: 5, number: 105, capacity: 1, currentOccupants: 0 },
+  { id: 5, number: 105, capacity: 10, currentOccupants: 0 },
   { id: 6, number: 201, capacity: 2, currentOccupants: 0 }
 ]
 

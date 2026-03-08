@@ -1,309 +1,143 @@
 <script setup>
-import { currentUser } from '@/services/authService';
+import { computed } from 'vue'
+import { appointments } from '@/services/appointmentService'
+import { currentUser } from '@/services/authService'
+import { doctors } from '@/services/doctorService'
+import { patients } from '@/services/patientService'
+import { users } from '@/services/userService'
 
+/* ================================
+   DOCTEUR CONNECTÉ
+================================ */
 
+const doctorUser = computed(() =>
+  users.value.find(u => u.id === currentUser.value?.id) || null
+)
+
+const doctor = computed(() =>
+  doctors.value.find(d => d.userId === doctorUser.value?.id) || null
+)
+
+/* ================================
+   PATIENTS DU DOCTEUR
+================================ */
+
+const myPatients = computed(() => {
+  if (!doctor.value) return []
+  return patients.value.filter(p => p.doctorId === doctor.value.id)
+})
+
+const myHospitalizedPatients = computed(() =>
+  myPatients.value.filter(p => p.status === 'Hospitalisé')
+)
+
+/* ================================
+   RENDEZ-VOUS DU DOCTEUR
+================================ */
+
+const myAppointments = computed(() => {
+  if (!doctor.value) return []
+  return appointments.value.filter(a => a.doctorId === doctor.value.id)
+})
+
+const today = new Date().toISOString().split('T')[0]
+
+const todayAppointments = computed(() =>
+  myAppointments.value.filter(a => a.date === today)
+)
+
+const upcomingAppointments = computed(() => {
+  return myAppointments.value
+    .filter(a => a.date >= today)
+    .map(a => {
+      const patient = patients.value.find(p => p.id === a.patientId)
+      return {
+        ...a,
+        patientName: patient
+          ? `${patient.firstName} ${patient.lastName}`
+          : 'Patient inconnu'
+      }
+    })
+    .sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`))
+})
 </script>
 
-
 <template>
-<Header />
+  <div class="space-y-8 p-6">
 
-  <div class="dashboard-doctor">
-  <main class="main-content">
-    <h1 class="dach">DASHBOARD MEDECIN</h1>
-    <h2 class="dr">Bienvenue, {{ currentUser.name}}</h2><br><br>
+    <!-- HEADER -->
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Dashboard Médecin</h2>
+      <p class="text-gray-500">
+        Bienvenue Dr. {{ currentUser?.name || '...' }}
+      </p>
+    </div>
 
-    <div class="stats">
-<div class="card">
-<h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg> Mes Patients</h3>
-<p>2</p>
-</div>
-<div class="card">
-<h3> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Rendez-vous Aujourd'hui</h3>
-<p>2</p>
-</div>
-<div class="card">
-<h3> <div class="p-3 rounded-lg bg-accent text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-check" aria-hidden="true"><path d="m16 11 2 2 4-4"></path><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div> Patients Hospitalisés</h3>
-<p>1</p>
-</div>
-</div>
+    <!-- STATS -->
+    <div class="grid grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm">
+        <p class="text-gray-500">Mes Patients</p>
+        <h3 class="text-3xl font-bold mt-2">{{ myPatients.length }}</h3>
+      </div>
 
-    <section class="appointments">
-<h2>Prochains rendez-vous</h2>
-<table>
-<thead>
-<tr>
-<th>Patient</th>
-<th>Date</th>
-<th>Heure</th>
-<th>Statut</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pierre Bernard</td>
-<td>16/02/2026</td>
-<td>09:00</td>
-<td>Confirmé</td>
-</tr>
-<tr>
-<td>Jean Dupont</td>
-<td>16/02/2026</td>
-<td>10:30</td>
-<td>Confirmé</td>
-</tr>
-</tbody>
-</table>
-</section>
+      <div class="bg-white p-6 rounded-xl shadow-sm">
+        <p class="text-gray-500">Hospitalisés</p>
+        <h3 class="text-3xl font-bold mt-2 text-red-500">{{ myHospitalizedPatients.length }}</h3>
+      </div>
 
-    <section class="hospitalized">
-<h2>Mes patients hospitalisés</h2>
-<table>
-<thead>
-<tr>
-<th>Nom</th>
-<th>Groupe sanguin
-</th> <th>Chambre</th>
-<th>Téléphone</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Jean Dupont</td>
-<td>A+</td>
-<td>1</td>
-<td>06 12 34 56 78</td>
-</tr>
-</tbody>
-</table>
-</section>
-</main>
-</div>
+      <div class="bg-white p-6 rounded-xl shadow-sm">
+        <p class="text-gray-500">RDV Aujourd'hui</p>
+        <h3 class="text-3xl font-bold mt-2 text-green-500">{{ todayAppointments.length }}</h3>
+      </div>
+    </div>
+
+    <!-- PROCHAINS RDV -->
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+      <h3 class="font-semibold mb-4">Prochains Rendez-vous</h3>
+      <table class="w-full text-left">
+        <thead class="border-b">
+          <tr class="text-gray-500 text-sm">
+            <th class="py-3">Patient</th>
+            <th>Date</th>
+            <th>Heure</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr v-for="rdv in upcomingAppointments" :key="rdv.id">
+            <td class="py-4">{{ rdv.patientName }}</td>
+            <td>{{ rdv.date }}</td>
+            <td>{{ rdv.time }}</td>
+            <td>
+              <span :class="rdv.status === 'Confirmé' ? 'text-green-600' : 'text-yellow-500'">
+                {{ rdv.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PATIENTS HOSPITALISÉS -->
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+      <h3 class="font-semibold mb-4">Mes Patients Hospitalisés</h3>
+      <table class="w-full text-left">
+        <thead class="border-b">
+          <tr class="text-gray-500 text-sm">
+            <th class="py-3">Nom</th>
+            <th>Chambre</th>
+            <th>Téléphone</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr v-for="patient in myHospitalizedPatients" :key="patient.id">
+            <td class="py-4">{{ patient.firstName }} {{ patient.lastName }}</td>
+            <td>{{ patient.room }}</td>
+            <td>{{ patient.phone }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 </template>
-
-<style scoped>
-hr{
-color: rgba(128, 128, 128, 0.568);
-}
-.active{
-  display: flex;
-  gap: 10px;
-}
-
-.hosp{
-  display: flex;
-  gap: 10px;
-}
-
-body {
-
-  margin: 0;
-
-  font-family: 'Segoe UI', sans-serif;
-
-  background-color: #f4fef8;
-
-  color: #333;
-
-}
-
-.dashboard-doctor {
-position: relative;
-
-  display: flex;
-
-  min-height: 100vh;
-
-}
-
-.sidebar {
-
-  width: 220px;
-
-  background-color: #13664c;
-
-  color: white;
-
-  padding: 20px;
-
-}
-
-.sidebar h2 {
-
-  font-size: 18px;
-
-  margin-bottom: 30px;
-
-}
-
-.sidebar ul {
-
-  list-style: none;
-
-  padding: 0;
-
-}
-
-.sidebar li {
-
-  margin: 15px 0;
-
-  cursor: pointer;
-
-  padding: 8px 12px;
-
-  border-radius: 6px;
-
-}
-
-.sidebar li.active{
-  background-color: rgba(255, 255, 255, 0.534);
-
-}
-
-.sidebar li:hover {
-
-  background-color: #8eb1905b;
-
-}
-
-.main-content {
-
-  flex: 1;
-
-  padding: 30px;
-
-  background-color: #f4fef8;
-
-}
-
-.main-content h1 {
-
-  margin-bottom: 30px;
-
-  color: #13664c;
-
-}
-
-.stats {
-
-  display: flex;
-
-  gap: 20px;
-
-  margin-bottom: 40px;
-
-}
-
-.card {
-
-  background-color: white;
-
-  padding: 20px;
-
-  border-left: 6px solid #13664c;
-
-  border-radius: 8px;
-
-  flex: 1;
-
-  box-shadow: 0 2px 4px rgba(0, 128, 0, 0.1);
-
-}
-.card:hover{
-    box-shadow: 0 2px 4px rgba(113, 128, 113, 0.692);
-}
-
-.card h3 {
-
-  font-size: 14px;
-
-  color: #388e3c;
-
-  margin-bottom: 10px;
-
-}
-
-.card p {
-
-  font-size: 28px;
-
-  font-weight: bold;
-
-  color: #2e7d32;
-
-  margin: 0;
-
-}
-
-section {
-
-  background-color: white;
-
-  padding: 20px;
-
-  border-radius: 8px;
-
-  margin-bottom: 30px;
-
-  box-shadow: 0 2px 4px rgba(0, 128, 0, 0.1);
-
-}
-
-section h2 {
-
-  margin-bottom: 20px;
-
-  color: #2e7d32;
-
-}
-
-table {
-
-  width: 100%;
-
-  border-collapse: collapse;
-
-}
-
-th,
-
-td {
-
-  padding: 12px;
-
-  text-align: left;
-
-  border-bottom: 1px solid #e0f2f1;
-
-}
-
-th {
-
-  background-color: #e8f5e9;
-
-  color: #388e3c;
-
-  font-weight: 600;
-
-}
-.dr{
-  color: black;
-
-}
-.dach{
-  font-size: 40px;
-
-}
-tr:hover{
-  box-shadow: 0 2px 4px rgba(0, 128, 0, 0.1);
-  background-color: rgba(128, 128, 128, 0.137);
-}
-#decon{
-  position: absolute;
-  bottom: 5px;
-}
-</style>
-
-
-

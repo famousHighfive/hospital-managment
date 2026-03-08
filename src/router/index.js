@@ -83,6 +83,7 @@ const router = createRouter({
         { path: 'doctor', name: 'dashboard-receptioniste-doctor', component: DoctorReception },
         { path: 'appointment', name: 'dashboard-receptioniste-appointment', component: AppointmentReception },
         { path: 'room', name: 'dashboard-receptioniste-room', component: RoomReception },
+        { path: 'assign-patient', name: 'assign-patient', component: AssignPatientModal},
       ]
     },
     {

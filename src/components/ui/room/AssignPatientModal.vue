@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { patients } from '@/services/patientService'
 import { rooms } from '@/services/roomService'
+import Swal from 'sweetalert2'
+import { currentUser } from '@/services/authService'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,7 +33,11 @@ const assignPatient = () => {
 
   // 🚫 Si chambre pleine
   if (room.value.currentOccupants >= room.value.capacity) {
-    alert("Chambre déjà complète")
+    // alert("Chambre déjà complète")
+    Swal.fire({
+  title: "Chambre déja complète!",
+  icon: "error"
+});
     return
   }
 
@@ -44,7 +50,11 @@ const assignPatient = () => {
   // ✅ Sauvegarder
   localStorage.setItem('patients', JSON.stringify(patients.value))
   localStorage.setItem('rooms', JSON.stringify(rooms.value))
-
+if (currentUser?.role === 'admin') {
+  router.push({ name: 'dashbord-admin-room' })
+} else if (currentUser?.role === 'receptioniste') {
+  router.push({ name: 'dashboard-receptioniste-room' })
+}
   router.push({ name: 'dashbord-admin-room' })
 }
 </script>

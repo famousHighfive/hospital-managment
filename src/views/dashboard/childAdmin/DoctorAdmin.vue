@@ -50,17 +50,18 @@ function handleCloseModal() {
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">Gestion des Médecins</h2>
       <button
-        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-        @click="showModal = true"
-      >
+        class="flex items-center gap-2 bg-[#108565] text-white px-5 py-2.5 rounded-lg hover:bg-[#0d6d53] transition shadow-md font-semibold"
+        @click="showModal = true">
         + Ajouter Médecin
       </button>
     </div>
 
     <!-- Filtres -->
-    <div class="flex gap-4 mb-6">
-      <input v-model="search" placeholder="Recherche..." class="border p-2 rounded-lg w-1/3" />
-      <select v-model="filterAvailable" class="border p-2 rounded-lg">
+    <div class="gap-4 mb-6 grid md:grid-cols-3">
+      <input v-model="search" placeholder="Recherche..."
+        class="w-full border p-2 focus:outline-none focus:ring-2 focus:ring-green-600 " />
+      <select v-model="filterAvailable"
+        class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
         <option value="">Tous</option>
         <option value="true">Disponible</option>
         <option value="false">Indisponible</option>
@@ -93,7 +94,7 @@ function handleCloseModal() {
             </td>
             <td class="p-4">{{ getPatientCount(d.id) }}</td>
             <td class="p-4 text-right space-x-2">
-              <button class="text-blue-600 hover:text-blue-800" @click="handleEdit(d)">✏️</button>
+              <button class="text-green-600 hover:text-green-800" @click="handleEdit(d)">✏️</button>
               <button class="text-red-500 hover:text-red-700" @click="deleteDoctor(d.id)">🗑️</button>
             </td>
           </tr>
@@ -109,10 +110,7 @@ function handleCloseModal() {
 
     <!-- Modal Ajouter / Modifier -->
     <BaseModal v-model="showModal">
-      <DoctorModalForm
-        :doctor="editingDoctor"
-        @close="handleCloseModal"
-      />
+      <DoctorModalForm :doctor="editingDoctor" @close="handleCloseModal" />
     </BaseModal>
 
   </div>
