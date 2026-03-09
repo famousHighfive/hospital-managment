@@ -1,12 +1,15 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { getDoctors, deleteDoctor } from '@/services/doctorService'
+import { ref, computed, onMounted } from 'vue'
+import { getDoctors, deleteDoctor, doctors } from '@/services/doctorService'
 import { patients } from '@/services/patientService'
 import DoctorModalForm from '@/components/ui/doctor/DoctorModalForm.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 
 
-const doctors = getDoctors()
+// const doctors = getDoctors()
+ onMounted(() => {
+        getDoctors()
+    })
 
 const search = ref('')
 const filterAvailable = ref('')

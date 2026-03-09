@@ -1,72 +1,66 @@
-
 import { ref } from 'vue'
+
 export const selectedRoom = ref(null)
- const defaultRooms = [
-  { id: 1, number: 101, capacity: 2, currentOccupants: 0 },
-  { id: 2, number: 102, capacity: 9, currentOccupants: 0 },
-  { id: 3, number: 103, capacity: 1, currentOccupants: 0 },
-  { id: 4, number: 104, capacity: 2, currentOccupants: 0 },
-  { id: 5, number: 105, capacity: 10, currentOccupants: 0 },
-  { id: 6, number: 201, capacity: 2, currentOccupants: 0 }
-]
+export const rooms = ref([]) // tableau synchronisé avec le backend
+const API_URL = 'http://localhost:3000/api/rooms' // URL de ton backend
 
-
-export const savedRooms = JSON.parse(localStorage.getItem('rooms'))
-
-export const rooms = ref(savedRooms || defaultRooms)
-console.log(rooms);
-
-function saveRooms() {
-  localStorage.setItem('rooms', JSON.stringify(rooms.value))
-}
-
- function getRooms() {
+// 🔹 Récupérer toutes les chambres depuis le backend
+export async function getRooms() {
+  try {
+    const res = await fetch(API_URL)
+    if (!res.ok) throw new Error('Impossible de récupérer les chambres')
+    rooms.value = await res.json()
+  } catch (error) {
+    console.error(error)
+    rooms.value = [] // si backend indisponible
+  }
   return rooms
 }
 
+// 🔹 Ajouter une chambre via backend
+export async function addRoom(newRoom) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        number: Number(newRoom.number),
+        capacity: Number(newRoom.capacity)
+      })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Impossible d’ajouter la chambre')
 
-
-export function addRoom(newRoom) {
-
-  const exists = rooms.value.find(r => r.number === newRoom.number)
-
-  if (exists) {
-    return { success: false, message: "Numéro de chambre déjà utilisé" }
+    rooms.value.push(data)
+    return { success: true, message: 'Chambre ajoutée avec succès' }
+  } catch (error) {
+    return { success: false, message: error.message }
   }
-
-  const room = {
-    id: Date.now(),
-    number: Number(newRoom.number),
-    capacity: Number(newRoom.capacity),
-    currentOccupants: 0
-  }
-
-  rooms.value.push(room)
-  saveRooms()
-
-  return { success: true, message: "Chambre ajoutée avec succès" }
 }
 
-export function deleteRoom(id) {
-  rooms.value = rooms.value.filter(r => r.id !== id)
-  saveRooms()
+// 🔹 Supprimer une chambre via backend
+export async function deleteRoom(id) {
+  try {
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Impossible de supprimer la chambre')
+
+    rooms.value = rooms.value.filter(r => r.id !== id)
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-
+// 🔹 Incrémenter occupants localement
 export function incrementRoomOccupants(roomNumber) {
   const room = rooms.value.find(r => r.number === Number(roomNumber))
-  if (room) {
-    room.currentOccupants++
-    saveRooms()
-  }
+  if (room) room.currentOccupants++
 }
 
+// 🔹 Décrémenter occupants localement
 export function decrementRoomOccupants(roomNumber) {
   const room = rooms.value.find(r => r.number === Number(roomNumber))
-  if (room && room.currentOccupants > 0) {
-    room.currentOccupants--
-    saveRooms()
-  }
+  if (room && room.currentOccupants > 0) room.currentOccupants--
 }
 
-export default {getRooms,defaultRooms}
+export default { getRooms }

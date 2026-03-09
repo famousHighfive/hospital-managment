@@ -1,35 +1,62 @@
 <script setup>
+// import Notification from '@/components/Notification.vue';
+// import { login } from '@/services/authService';
+// import { reactive, ref } from 'vue';
+// import { useRouter } from 'vue-router';
+
+// const router = useRouter()
+// const form = reactive({email: '', password: ''})
+// const showNotif = ref(false)
+// const msg = ref('')
+// const type = ref('')
+
+
+
+// const submitForm = () => {
+//   const response = login(form.email, form.password)
+
+//   if(response.success){
+//     if(response.user.role === 'admin') router.push('/dashboard-admin')
+//     if(response.user.role === 'doctor') router.push('/dashboard-doctor')
+//     if(response.user.role === 'receptioniste') router.push('/dashboard-receptioniste')
+//   }else{
+//     msg.value = response.message
+//     type.value = 'error'
+//     showNotif.value = true
+//     form.email = ''
+//     form.password = ''
+//   }
+// }
+
+
+
+import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import Notification from '@/components/Notification.vue';
 import { login } from '@/services/authService';
-import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
-const router = useRouter()
-const form = reactive({email: '', password: ''})
-const showNotif = ref(false)
-const msg = ref('')
-const type = ref('')
+const router = useRouter();
+const form = reactive({ email: "", password: "" });
+const showNotif = ref(false);
+const msg = ref("");
+const type = ref("");
 
+const submitForm = async () => {
+  const response = await login(form.email, form.password);
 
-
-const submitForm = () => {
-  const response = login(form.email, form.password)
-
-  if(response.success){
-    if(response.user.role === 'admin') router.push('/dashboard-admin')
-    if(response.user.role === 'doctor') router.push('/dashboard-doctor')
-    if(response.user.role === 'receptioniste') router.push('/dashboard-receptioniste')
-  }else{
-    msg.value = response.message
-    type.value = 'error'
-    showNotif.value = true
-    form.email = ''
-    form.password = ''
+  if (response.success) {
+    // rediriger selon le rôle
+    if (response.user.role === "admin") router.push("/dashboard-admin");
+    if (response.user.role === "doctor") router.push("/dashboard-doctor");
+    if (response.user.role === "receptioniste") router.push("/dashboard-receptioniste");
+  } else {
+    msg.value = response.message;
+    type.value = "error";
+    showNotif.value = true;
+    form.email = "";
+    form.password = "";
   }
-}
-
-
-
+};
 </script>
 
 

@@ -27,6 +27,10 @@ import DashboardReceptioniste from '@/views/dashboard/DashboardReceptioniste.vue
 import Unauthentificated from '@/views/Unauthentificated.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
+if (!currentUser.value && localStorage.getItem('user')) {
+  currentUser.value = JSON.parse(localStorage.getItem('user'))
+  isAuth.value = true
+}
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

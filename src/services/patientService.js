@@ -1,133 +1,192 @@
 import { ref } from 'vue'
 import Swal from 'sweetalert2'
-import { decrementRoomOccupants, incrementRoomOccupants } from './roomService'
 
-// 🔹 Chargement initial
-const storedPatients = localStorage.getItem('patients')
+export const patients = ref([])
 
-export const patients = ref(
-  storedPatients ? JSON.parse(storedPatients) : []
-)
+const API_URL = "http://localhost:3000/api/patients"
 
-const saveToLocalStorage = () => {
-  localStorage.setItem("patients", JSON.stringify(patients.value))
+const getToken = () => {
+  return localStorage.getItem("token")
+}
+
+//
+// 🔹 CHARGER LES PATIENTS DEPUIS LE BACKEND
+//
+export const loadPatients = async () => {
+  try {
+
+    const res = await fetch(API_URL, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+
+    const data = await res.json()
+    patients.value = data
+
+  } catch (error) {
+    console.error("Erreur chargement patients", error)
+  }
 }
 
 //
 // ✅ AJOUT PATIENT
 //
-export const addPatient = (newPatient) => {
-  const newId =
-    patients.value.length > 0
-      ? Math.max(...patients.value.map(p => p.id)) + 1
-      : 1
+export const addPatient = async (newPatient) => {
 
-  const patient = {
-    id: newId,
-    ...newPatient,
-    createdAt: new Date().toISOString()
+  try {
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(newPatient)
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      throw new Error(data.message)
+    }
+
+    patients.value.push(data)
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Patient ajouté',
+      showConfirmButton: false,
+      timer: 1500
+    })
+
+  } catch (error) {
+
+    Swal.fire({
+      icon: "error",
+      title: "Erreur",
+      text: error.message
+    })
+
   }
-
-  patients.value.push(patient)
-
-  if (patient.status === 'Hospitalisé' && patient.room) {
-    incrementRoomOccupants(patient.room)
-  }
-
-  saveToLocalStorage()
-
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: 'Patient ajouté',
-    showConfirmButton: false,
-    timer: 1500
-  })
 }
 
 //
 // ✅ SUPPRESSION PATIENT
 //
-export const deletePatient = (id) => {
-  const patient = patients.value.find(p => p.id === id)
-  if (!patient) return
+export const deletePatient = async (id) => {
 
-  Swal.fire({
+  const result = await Swal.fire({
     title: "Supprimer ce patient ?",
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Oui",
     cancelButtonText: "Non"
-  }).then((result) => {
-    if (result.isConfirmed) {
-
-      if (patient.status === 'Hospitalisé' && patient.room) {
-        decrementRoomOccupants(patient.room)
-      }
-
-      patients.value = patients.value.filter(p => p.id !== id)
-      saveToLocalStorage()
-
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Patient supprimé',
-        showConfirmButton: false,
-        timer: 1500
-      })
-    }
   })
+
+  if (!result.isConfirmed) return
+
+  try {
+
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message)
+
+    patients.value = patients.value.filter(p => p.id !== id)
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Patient supprimé',
+      showConfirmButton: false,
+      timer: 1500
+    })
+
+  } catch (error) {
+
+    Swal.fire({
+      icon: "error",
+      title: "Erreur",
+      text: error.message
+    })
+
+  }
 }
 
 //
-// ✅ UPDATE PATIENT (avec vérification modification réelle)
+// ✅ UPDATE PATIENT
 //
-export const updatePatient = (updatedPatient) => {
-  const index = patients.value.findIndex(p => p.id === updatedPatient.id)
-  if (index === -1) return
+export const updatePatient = async (updatedPatient) => {
 
-  const oldPatient = patients.value[index]
+  try {
 
-  const isModified =
-    JSON.stringify(oldPatient) !==
-    JSON.stringify({ ...oldPatient, ...updatedPatient })
+    const res = await fetch(`${API_URL}/${updatedPatient.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(updatedPatient)
+    })
 
-  if (!isModified) return
+    const data = await res.json()
 
-  // 🔹 Décrément ancienne chambre si besoin
-  if (oldPatient.status === 'Hospitalisé' && oldPatient.room) {
-    decrementRoomOccupants(oldPatient.room)
+    if (!res.ok) throw new Error(data.message)
+
+    const index = patients.value.findIndex(p => p.id === updatedPatient.id)
+
+    if (index !== -1) {
+      patients.value[index] = data
+    }
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Modification effectuée',
+      showConfirmButton: false,
+      timer: 1500
+    })
+
+  } catch (error) {
+
+    Swal.fire({
+      icon: "error",
+      title: "Erreur",
+      text: error.message
+    })
+
   }
-
-  patients.value[index] = {
-    ...oldPatient,
-    ...updatedPatient
-  }
-
-  const newPatient = patients.value[index]
-
-  // 🔹 Incrément nouvelle chambre si besoin
-  if (newPatient.status === 'Hospitalisé' && newPatient.room) {
-    incrementRoomOccupants(newPatient.room)
-  }
-
-  saveToLocalStorage()
-
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: 'Modification effectuée',
-    showConfirmButton: false,
-    timer: 1500
-  })
 }
 
 //
 // ✅ GET PATIENT
 //
-export const getPatientById = (id) => {
-  return patients.value.find(p => p.id === Number(id))
+export const getPatientById = async (id) => {
+
+  try {
+
+    const res = await fetch(`${API_URL}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+
+    const data = await res.json()
+
+    return data
+
+  } catch (error) {
+    console.error(error)
+  }
 }

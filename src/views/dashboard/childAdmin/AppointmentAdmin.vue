@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { appointments, deleteAppointment } from '@/services/appointmentService'
+import { ref, computed, onMounted } from 'vue'
+import { appointments, deleteAppointment, fetchAppointments } from '@/services/appointmentService'
 import { patients } from '@/services/patientService'
-import { doctors } from '@/services/doctorService'
+import { doctors, getDoctors } from '@/services/doctorService'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import FormAppointment from '@/components/form/FormAppointment.vue'
 
@@ -11,19 +11,28 @@ const search = ref('')
 const statusFilter = ref('') // <-- nouveau filtre
 
 const filteredAppointments = computed(() => {
-    return appointments.value.filter(app => {
+  return appointments.value.filter(app => {
 
-        const patientMatch =
-            getPatientName(app.patientId)
-                .toLowerCase()
-                .includes(search.value.toLowerCase())
+    const patientMatch =
+    getPatientName(app.patientId)
+    .toLowerCase()
+    .includes(search.value.toLowerCase())
 
-        const statusMatch =
-            !statusFilter.value || app.status === statusFilter.value
+    const statusMatch =
+    !statusFilter.value || app.status === statusFilter.value
 
         return patientMatch && statusMatch
+      })
     })
-})
+    onMounted(() => {
+        fetchAppointments()
+    })
+     onMounted(() => {
+        getDoctors()
+    })
+// onMounted(() => {
+//     fetchAppointments()
+// })
 
 const getPatientName = (id) => {
     const p = patients.value.find(p => p.id === id)
@@ -102,7 +111,7 @@ const editAppointment = (rdv) => {
                             }">{{ rdv.status }}</span>
                         </td>
                         <td class="p-4">
-                                <button 
+                                <button
         @click="editAppointment(rdv)"
         class="text-blue-500 hover:text-blue-700"
     >
@@ -119,7 +128,7 @@ const editAppointment = (rdv) => {
 
 
       <BaseModal v-model="showModal">
-    <FormAppointment 
+    <FormAppointment
         :appointment="selectedAppointment"
         @close="showModal = false; selectedAppointment = null"
     />

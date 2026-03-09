@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { patients } from '@/services/patientService'
+import { ref, computed, watch, onMounted } from 'vue'
+import { loadPatients, patients } from '@/services/patientService'
 import { doctors } from '@/services/doctorService'
 import { addAppointment, appointments } from '@/services/appointmentService'
 import { currentUser } from '@/services/authService'
@@ -9,6 +9,11 @@ import { users } from '@/services/userService'
 const props = defineProps({
     appointment: Object // <-- prop pour l’édition
 })
+
+onMounted(async () => {
+    await loadPatients()
+})
+console.log(patients);
 
 const role = computed(() => currentUser.value?.role)
 const emit = defineEmits(['close'])
@@ -158,11 +163,7 @@ const handleSubmit = () => {
     <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-md">
 
         <h2 class="text-2xl font-bold mb-8 text-gray-800">
-<<<<<<< HEAD
-            Nouveau Rendez-vous
-=======
             {{ props.appointment ? 'Modifier Rendez-vous' : 'Nouveau Rendez-vous' }}
->>>>>>> 6090430910b974bdc2668eb9cc660fb266e26e78
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -195,15 +196,6 @@ const handleSubmit = () => {
             <!-- Médecin -->
             <div>
                 <label class="block text-sm font-medium mb-1">Médecin</label>
-<<<<<<< HEAD
-                <select v-model="doctorId"
-                    class="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-[#108565] focus:outline-none">
-                    <option disabled value="">Sélectionner un médecin</option>
-                    <option v-for="d in availableDoctors" :key="d.id" :value="d.id">
-                        {{ d.name }}
-                    </option>
-                </select>
-=======
                 <select v-model="doctorId" :disabled="role === 'doctor'"
                     class="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-[#108565] focus:outline-none disabled:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-100 disabled:text-gray-700">
 
@@ -221,7 +213,6 @@ const handleSubmit = () => {
                     </template>
                 </select>
 
->>>>>>> 6090430910b974bdc2668eb9cc660fb266e26e78
                 <p v-if="errors.doctor" class="text-red-500 text-xs mt-1">
                     {{ errors.doctor }}
                 </p>
@@ -259,10 +250,6 @@ const handleSubmit = () => {
 
         </div>
 
-<<<<<<< HEAD
-        <!-- Boutons -->
-=======
->>>>>>> 6090430910b974bdc2668eb9cc660fb266e26e78
         <div class="flex justify-end gap-4 mt-10">
             <button @click="$emit('close')"
                 class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
@@ -271,11 +258,7 @@ const handleSubmit = () => {
 
             <button @click="handleSubmit"
                 class="px-6 py-2 bg-[#108565] text-white rounded-lg font-medium hover:bg-[#0d6b50] transition">
-<<<<<<< HEAD
-                Enregistrer
-=======
                 {{ props.appointment ? 'Modifier' : 'Enregistrer' }}
->>>>>>> 6090430910b974bdc2668eb9cc660fb266e26e78
             </button>
         </div>
 

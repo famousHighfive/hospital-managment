@@ -7,79 +7,103 @@ export const medicalSpecialities = [
   "Psychiatrie", "Radiologie", "Anesthésiologie", "Chirurgie Générale"
 ]
 
-const stored = localStorage.getItem('doctors')
-export const doctors = ref(stored ? JSON.parse(stored) : [])
 
-function save() {
-  localStorage.setItem('doctors', JSON.stringify(doctors.value))
-}
+const API_URL = 'http://localhost:3000/api/doctors' // ton backend
+export const doctors = ref([])
 
-export function getDoctors() {
+// 🔹 Récupérer les médecins depuis le backend
+export async function getDoctors() {
+  try {
+    const res = await fetch(API_URL)
+    if (!res.ok) throw new Error('Impossible de récupérer les médecins')
+    doctors.value = await res.json()
+  } catch (error) {
+    console.error(error)
+    Swal.fire('Erreur', error.message, 'error')
+  }
   return doctors
 }
 
-export function addDoctor(doctor) {
-  doctor.id = Date.now()
-  doctor.userId = null // liaison utilisateur
-  doctor.createdAt = new Date().toISOString()
+// 🔹 Ajouter un médecin (backend + mise à jour locale)
+export async function addDoctor(doctor) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(doctor)
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Impossible d’ajouter')
+    doctors.value.push(data)
 
-  doctors.value.push(doctor)
-  save()
-
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: 'Médecin ajouté',
-    showConfirmButton: false,
-    timer: 1500
-  })
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Médecin ajouté',
+      showConfirmButton: false,
+      timer: 1500
+    })
+  } catch (error) {
+    Swal.fire('Erreur', error.message, 'error')
+  }
 }
 
+// 🔹 Modifier un médecin
+export async function updateDoctor(updatedDoctor) {
+  try {
+    const res = await fetch(`${API_URL}/${updatedDoctor.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedDoctor)
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Impossible de modifier')
 
-export function updateDoctor(updatedDoctor) {
-  const index = doctors.value.findIndex(d => d.id === updatedDoctor.id)
-  if (index === -1) return
+    const index = doctors.value.findIndex(d => d.id === updatedDoctor.id)
+    if (index !== -1) doctors.value[index] = data
 
-  const isModified =
-    JSON.stringify(doctors.value[index]) !==
-    JSON.stringify(updatedDoctor)
-
-  if (!isModified) return
-
-  doctors.value[index] = updatedDoctor
-  save()
-
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: 'Modification effectuée',
-    showConfirmButton: false,
-    timer: 1500
-  })
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Modification effectuée',
+      showConfirmButton: false,
+      timer: 1500
+    })
+  } catch (error) {
+    Swal.fire('Erreur', error.message, 'error')
+  }
 }
 
-export function deleteDoctor(id) {
-  Swal.fire({
-    title: "Supprimer ?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Oui",
-    cancelButtonText: "Non"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      doctors.value = doctors.value.filter(d => d.id !== id)
-      save()
+// 🔹 Supprimer un médecin
+export async function deleteDoctor(id) {
+  try {
+    const result = await Swal.fire({
+      title: "Supprimer ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Oui",
+      cancelButtonText: "Non"
+    })
 
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Supprimé',
-        showConfirmButton: false,
-        timer: 1500
-      })
-    }
-  })
+    if (!result.isConfirmed) return
+
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Impossible de supprimer')
+
+    doctors.value = doctors.value.filter(d => d.id !== id)
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Supprimé',
+      showConfirmButton: false,
+      timer: 1500
+    })
+  } catch (error) {
+    Swal.fire('Erreur', error.message, 'error')
+  }
 }

@@ -1,20 +1,20 @@
 <script setup>
 import { currentUser } from '@/services/authService';
-import { onMounted, ref } from 'vue';
+// import { onMounted, ref } from 'vue';
 
-const userInitial = () => {
-  let fullName = currentUser.value.name.split(" ")
+// const userInitial = () => {
+//   let fullName = currentUser.value.name.split(" ")
 
-  let output = []
-  for (let index = 0; index < fullName.length; index++) {
-    output.push(fullName[index][0])
-  }
-  return output.join("").toUpperCase()
-}
-onMounted(() => {
-  userInitial()
-})
-let inital = ref(userInitial())
+//   let output = []
+//   for (let index = 0; index < fullName.length; index++) {
+//     output.push(fullName[index][0])
+//   }
+//   return output.join("").toUpperCase()
+// }
+// onMounted(() => {
+//   userInitial()
+// })
+// let inital = ref(userInitial())
 
 
 </script>

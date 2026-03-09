@@ -4,6 +4,9 @@ import { deletePatient, patients } from '@/services/patientService'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import PatientFormModal from '@/components/ui/patient/PatientFormModal.vue'
 import { doctors } from '@/services/doctorService'
+import { onMounted } from "vue"
+import { loadPatients } from "@/services/patientService"
+
 
 const search = ref('')
 const showAddModal = ref(false)
@@ -30,9 +33,12 @@ const filteredPatients = computed(() => {
 
     return matchesSearch && matchesStatus
   })
+
 })
 
-
+onMounted(() => {
+  loadPatients()
+})
 
 /* --------------------------
    EDIT
