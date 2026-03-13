@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { addUser, users } from '@/services/userService'
-import { getDoctors, updateDoctor } from '@/services/doctorService'
-import { getReceptionists, updateReceptionist } from '@/services/receptionistService'
+import { getDoctors, updateDoctor, doctors } from '@/services/doctorService'
+import { getReceptionists, updateReceptionist, receptionists } from '@/services/receptionistService'
 
 const emit = defineEmits(['close'])
 const props = defineProps({
@@ -11,24 +11,31 @@ const props = defineProps({
 
 const name = ref(props.user?.name || '')
 const email = ref(props.user?.email || '')
-const password = ref('')
+const password = ref('') // jamais prérempli
 const role = ref(props.user?.role || '')
 const selectedProfile = ref(props.user?.profileId || '')
 
 const errors = ref({})
 
-const doctors = getDoctors()
-const receptionists = getReceptionists()
+// 🔹 Charger les médecins et réceptionnistes si pas déjà
+getDoctors()
+getReceptionists()
 
-// 🔥 Médecins disponibles (inclut le profil existant si édition)
+// 🔹 Médecins disponibles (inclus le profil existant si édition)
 const availableDoctors = computed(() =>
-  doctors.value.filter(d => !d.userId || (props.user && d.userId === props.user.id))
+  (doctors.value || []).filter(d => !d.userId || (props.user && d.userId === props.user.id))
 )
 
-// 🔥 Réceptionnistes disponibles (inclut le profil existant si édition)
+// 🔹 Réceptionnistes disponibles (inclus le profil existant si édition)
 const availableReceptionists = computed(() =>
-  receptionists.value.filter(r => !r.userId || (props.user && r.userId === props.user.id))
+  (receptionists.value || []).filter(r => !r.userId || (props.user && r.userId === props.user.id))
 )
+
+watchEffect(() => {
+  // debug : voir quand les données arrivent
+  console.log("Doctors:", doctors.value)
+  console.log("Receptionists:", receptionists.value)
+})
 
 function handleSubmit() {
   errors.value = {}
@@ -83,7 +90,7 @@ function handleSubmit() {
   // Assignation au profil
   // ----------------------------
   if (role.value === 'doctor') {
-    const doctor = doctors.value.find(d => d.id === selectedProfile.value)
+    const doctor = (doctors.value || []).find(d => d.id === selectedProfile.value)
     if (doctor) {
       doctor.userId = createdUser.id
       updateDoctor(doctor)
@@ -91,7 +98,7 @@ function handleSubmit() {
   }
 
   if (role.value === 'receptioniste') {
-    const receptionist = receptionists.value.find(r => r.id === selectedProfile.value)
+    const receptionist = (receptionists.value || []).find(r => r.id === selectedProfile.value)
     if (receptionist) {
       receptionist.userId = createdUser.id
       updateReceptionist(receptionist)
@@ -108,15 +115,19 @@ function handleSubmit() {
       {{ props.user ? "Modifier Utilisateur" : "Nouvel Utilisateur" }}
     </h2>
 
+    <!-- Nom -->
     <input v-model="name" placeholder="Pseudo" class="border p-2 w-full mb-1 rounded" />
     <p v-if="errors.name" class="text-red-500 text-xs mb-2">{{ errors.name }}</p>
 
+    <!-- Email -->
     <input v-model="email" placeholder="Email" class="border p-2 w-full mb-1 rounded" />
     <p v-if="errors.email" class="text-red-500 text-xs mb-2">{{ errors.email }}</p>
 
+    <!-- Mot de passe -->
     <input type="password" v-model="password" placeholder="Mot de passe" class="border p-2 w-full mb-1 rounded" />
     <p v-if="errors.password" class="text-red-500 text-xs mb-2">{{ errors.password }}</p>
 
+    <!-- Rôle -->
     <select v-model="role" class="border p-2 w-full mb-1 rounded">
       <option disabled value="">Choisir un rôle</option>
       <option value="admin">Administrateur</option>
@@ -125,7 +136,7 @@ function handleSubmit() {
     </select>
     <p v-if="errors.role" class="text-red-500 text-xs mb-2">{{ errors.role }}</p>
 
-    <!-- 🔥 Sélection dynamique -->
+    <!-- 🔹 Sélection dynamique -->
     <select v-if="role === 'doctor'" v-model="selectedProfile" class="border p-2 w-full mb-1 rounded">
       <option disabled value="">Choisir un médecin</option>
       <option v-for="doc in availableDoctors" :key="doc.id" :value="doc.id">{{ doc.name }}</option>
@@ -137,6 +148,7 @@ function handleSubmit() {
     </select>
     <p v-if="errors.profile" class="text-red-500 text-xs mb-2">{{ errors.profile }}</p>
 
+    <!-- Boutons -->
     <div class="flex justify-end gap-3 mt-3">
       <button class="bg-gray-300 px-4 py-2 rounded" @click="$emit('close')">Annuler</button>
       <button class="bg-green-600 text-white px-4 py-2 rounded" @click="handleSubmit">

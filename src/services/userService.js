@@ -1,48 +1,75 @@
-import { ref } from 'vue'
-// import { fakeUsers } from '@/services/authService'
+import { ref } from "vue"
 
-const storedUsers = localStorage.getItem('users')
+const token = localStorage.getItem('token')  // récupère le token
+const API_URL = "http://localhost:3000/api/users"
 
-export const users = ref(storedUsers ?
-  JSON.parse(storedUsers) : [
-    { name: 'admin', email: 'admin@admin.com', password: '1234', role: 'admin' },
-    { name: 'doctor', email: 'doctor@doctor.com', password: '12345', role: 'doctor' },
-    { name: 'receptionniste Famous', email: 'reception@reception.com', password: '123456', role: 'receptioniste' }
-  ])
+export const users = ref([])
 
-function save() {
-  localStorage.setItem('users', JSON.stringify(users.value))
-}
+/* ======================
+   GET USERS
+====================== */
+export async function getUsers() {
+  const res = await fetch(API_URL, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`   // <- token ajouté
+    }
+  })
+  const data = await res.json()
 
-export function getUsers() {
+  users.value = Array.isArray(data) ? data : []
   return users
 }
 
-export function addUser(user) {
-  user.id = Date.now()
-  user.createdAt = new Date().toISOString()
+/* ======================
+   ADD USER
+====================== */
+export async function addUser(user) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`   // <- token ajouté
+    },
+    body: JSON.stringify(user)
+  })
 
-  //  Ajout dans users (gestion système)
-  users.value.push(user)
-  save()
-
-  //  Ajout automatique dans fakeUsers (pour login)
-  // fakeUsers.value.push({ ...user })
-  return user
-
+  const newUser = await res.json()
+  users.value.push(newUser)
+  return newUser
 }
 
-export function deleteUser(id) {
-  const user = users.value.find(u => u.id === id)
+/* ======================
+   UPDATE USER
+====================== */
+export async function updateUser(user) {
+  const res = await fetch(`${API_URL}/${user.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`   // <- token ajouté
+    },
+    body: JSON.stringify(user)
+  })
 
-  if (!user) return
+  const updated = await res.json()
+  const index = users.value.findIndex(u => u.id === updated.id)
+  if (index !== -1) {
+    users.value[index] = updated
+  }
+  return updated
+}
 
-  // Supprimer dans users
+/* ======================
+   DELETE USER
+====================== */
+export async function deleteUser(id) {
+  await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`   // <- token ajouté
+    }
+  })
+
   users.value = users.value.filter(u => u.id !== id)
-  save()
-
-  //  Supprimer aussi dans fakeUsers
-  // fakeUsers.value = fakeUsers.value.filter(
-  // u => u.email !== user.email
-  // )
 }
